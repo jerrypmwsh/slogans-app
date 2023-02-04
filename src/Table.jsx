@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import { Container } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
@@ -51,7 +52,8 @@ export default function Table() {
   React.useEffect(() => {
 
     const fetchData = async () => {
-        const url = "https://hf07i6khm5.execute-api.us-west-2.amazonaws.com/api/slogans";
+        //const url = "https://hf07i6khm5.execute-api.us-west-2.amazonaws.com/api/slogans";
+        const url = "http://localhost:8000/slogans";
     
         try {
             const token = await getAccessTokenSilently({
@@ -73,6 +75,7 @@ export default function Table() {
 }, [getAccessTokenSilently]);
 
 
+  // TODO: Make the handlers actually do something
   const handleRowEditStart = (params, event) => {
     event.defaultMuiPrevented = true;
   };
@@ -113,22 +116,22 @@ export default function Table() {
 
   const columns = [
     { field: 'id', headerName: 'id', type:'number', editable: true },
-    { field: 'slogan', headerName: 'Slogan', width:180, editable: true },
-    { field: 'category', headerName: 'Category', width:180, editable: true },
-    { field: 'source', headerName: 'Source', width:180, editable: true },
-    { field: 'source_info', headerName: 'Source Info', width:180, editable: true },
+    { field: 'slogan', headerName: 'Slogan', flex: 1, editable: true },
+    { field: 'category', headerName: 'Category', flex: 1, editable: true },
+    { field: 'source', headerName: 'Source', flex: 1, editable: true },
+    { field: 'source_info', headerName: 'Source Info', flex: 1, editable: true },
     {
       field: 'update_date_time',
       headerName: 'Date Updated',
       type: 'date',
-      width: 180,
+      flex: 1,
       editable: true,
     },
     {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
-      width: 100,
+      flex: 1,
       cellClassName: 'actions',
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
@@ -170,9 +173,9 @@ export default function Table() {
   ];
 
   return (
-    <Box
+    <Container
       sx={{
-        height: 500,
+        height: 750,
         width: '100%',
         '& .actions': {
           color: 'text.secondary',
@@ -199,6 +202,6 @@ export default function Table() {
         }}
         experimentalFeatures={{ newEditingApi: true }}
       />
-    </Box>
+    </Container>
   );
 }

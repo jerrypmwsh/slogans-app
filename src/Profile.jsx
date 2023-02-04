@@ -8,6 +8,7 @@ const Profile = () => {
     return <div>Loading ...</div>;
   }
 
+  // TODO: Make this smaller; it's what's causing the navbar to be huge.
   return (
     isAuthenticated && (
       <div>

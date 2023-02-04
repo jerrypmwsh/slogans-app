@@ -1,21 +1,15 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
 import './App.css'
-import LoginButton from './LoginButton'
-import LogoutButton from './LogoutButton'
-import Profile from './Profile'
+import { Container } from '@mui/material'
+import NavBar from './NavBar'
 import Table from './Table'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="App">
+    <Container sx={{width: 1}}>
+      <NavBar></NavBar>
       <Table></Table>
-      <LoginButton></LoginButton>
-      <LogoutButton></LogoutButton>
-      <Profile></Profile>
-    </div>
+    </Container>
+    
   )
 }
 
