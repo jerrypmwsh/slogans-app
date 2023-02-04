@@ -12,6 +12,7 @@ import {
   DataGrid,
   GridToolbarContainer,
   GridActionsCellItem,
+  GridToolbar,
 } from "@mui/x-data-grid";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -57,6 +58,7 @@ function EditToolbar(props) {
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
         Add record
       </Button>
+      <GridToolbar></GridToolbar>
     </GridToolbarContainer>
   );
 }
