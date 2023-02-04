@@ -114,12 +114,46 @@ export default function Table() {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
 
-  const handleSaveClick = (id) => () => {
-    
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+  const handleSaveClick =  (params) => async () => {
+    try {
+      const token = await getAccessTokenSilently({
+            audience: 'https://tresosos.com/slogans',
+        });
+      const response = await fetch(`${url}/${params.id}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(params)
+      });
+      const json = await response.json();
+      setRows((oldRows) => [json, ...oldRows]);
+      const id = json.id;
+    setRowModesModel((oldModel) => ({
+      ...oldModel,
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'slogan' },
+    }));
+  } catch (error) {
+      console.error(error);
+  }
+    setRowModesModel({ ...rowModesModel, [params.row.id]: { mode: GridRowModes.View } });
   };
 
-  const handleDeleteClick = (id) => () => {
+  const handleDeleteClick = (id) => async () => {
+    try {
+      const token = await getAccessTokenSilently({
+            audience: 'https://tresosos.com/slogans',
+        });
+      const response = await fetch(`${url}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+      });
+  } catch (error) {
+      console.error(error);
+  }
     setRows(rows.filter((row) => row.id !== id));
   };
 
@@ -160,21 +194,21 @@ export default function Table() {
       headerName: 'Actions',
       flex: 1,
       cellClassName: 'actions',
-      getActions: ({ id }) => {
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+      getActions: (params) => {
+        const isInEditMode = rowModesModel[params.id]?.mode === GridRowModes.Edit;
 
         if (isInEditMode) {
           return [
             <GridActionsCellItem
               icon={<SaveIcon />}
               label="Save"
-              onClick={handleSaveClick(id)}
+              onClick={handleSaveClick(params)}
             />,
             <GridActionsCellItem
               icon={<CancelIcon />}
               label="Cancel"
               className="textPrimary"
-              onClick={handleCancelClick(id)}
+              onClick={handleCancelClick(params.id)}
               color="inherit"
             />,
           ];
@@ -185,13 +219,13 @@ export default function Table() {
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
-            onClick={handleEditClick(id)}
+            onClick={handleEditClick(params.id)}
             color="inherit"
           />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete"
-            onClick={handleDeleteClick(id)}
+            onClick={handleDeleteClick(params.id)}
             color="inherit"
           />,
         ];
