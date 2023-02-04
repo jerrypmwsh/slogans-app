@@ -14,8 +14,6 @@ export default function NavBar() {
           Slogans
         </Typography>
         <Profile></Profile>
-        <LoginButton></LoginButton>
-        <LogoutButton></LogoutButton>
       </Toolbar>
     </AppBar>
   );
