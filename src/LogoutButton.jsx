@@ -7,7 +7,6 @@ const LogoutButton = ({ img, alt }) => {
   const { logout } = useAuth0();
   return (
     <Button
-      variant="contained"
       onClick={() =>
         logout({ logoutParams: { returnTo: window.location.origin } })
       }
