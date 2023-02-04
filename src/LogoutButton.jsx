@@ -1,6 +1,5 @@
 import React from "react";
 import { Avatar } from "@mui/material";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useAuth0 } from "@auth0/auth0-react";
 

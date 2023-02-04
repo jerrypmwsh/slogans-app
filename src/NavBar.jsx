@@ -2,8 +2,6 @@ import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import LoginButton from "./LoginButton";
-import LogoutButton from "./LogoutButton";
 import Profile from "./Profile";
 
 export default function NavBar() {
