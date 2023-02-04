@@ -16,17 +16,42 @@ import {
 } from '@mui/x-data-grid';
 import { useAuth0 } from "@auth0/auth0-react";
 
-
+//const url = "https://hf07i6khm5.execute-api.us-west-2.amazonaws.com/api/slogans";
+const url = "http://localhost:8000/slogans";
 function EditToolbar(props) {
   const { setRows, setRowModesModel } = props;
-
-  const handleClick = () => {
-    const id = randomId();
-    setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
+  const { getAccessTokenSilently } = useAuth0();
+  const handleClick = async () => {
+    try {
+      const token = await getAccessTokenSilently({
+            audience: 'https://tresosos.com/slogans',
+        });
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            slogan: '[NEW]',
+            company: '[NEW]',
+            category: '[NEW]',
+            source: '[NEW]',
+            source_info: '[NEW]',
+            updated_date_time: Date.now()
+          })
+      });
+      const json = await response.json();
+      setRows((oldRows) => [json, ...oldRows]);
+      const id = json.id;
     setRowModesModel((oldModel) => ({
       ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'slogan' },
     }));
+  } catch (error) {
+      console.error(error);
+  }
+    
   };
 
   return (
@@ -47,25 +72,26 @@ export default function Table() {
   const [rows, setRows] = React.useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
 
-  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
-
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  
   React.useEffect(() => {
 
     const fetchData = async () => {
-        //const url = "https://hf07i6khm5.execute-api.us-west-2.amazonaws.com/api/slogans";
-        const url = "http://localhost:8000/slogans";
-    
         try {
-            const token = await getAccessTokenSilently({
-                  audience: 'https://tresosos.com/slogans',
-              });
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                  },
+          if (isAuthenticated){
+            setRows([])
+          }
+          const token = await getAccessTokenSilently({
+                audience: 'https://tresosos.com/slogans',
             });
-            const json = await response.json();
-            setRows(json);
+          const response = await fetch(url, {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+                },
+          });
+          const json = await response.json();
+          setRows(json);
+          
         } catch (error) {
             console.error(error);
         }
@@ -89,6 +115,7 @@ export default function Table() {
   };
 
   const handleSaveClick = (id) => () => {
+    
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
