@@ -98,13 +98,9 @@ export default function Table() {
     fetchData();
   }, [getAccessTokenSilently]);
 
-  const handleRowEditStart = (params, event) => {
-    event.defaultMuiPrevented = true;
-  };
+  const handleRowEditStart = (params, event) => {};
 
-  const handleRowEditStop = (params, event) => {
-    event.defaultMuiPrevented = true;
-  };
+  const handleRowEditStop = (params, event) => {};
 
   const handleEditClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
@@ -121,7 +117,7 @@ export default function Table() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(params),
+        body: JSON.stringify({ ...params.row, updated_date_time: Date.now() }),
       });
       const json = await response.json();
       setRows((oldRows) => [json, ...oldRows]);
@@ -170,6 +166,7 @@ export default function Table() {
 
   const processRowUpdate = (newRow) => {
     const updatedRow = { ...newRow, isNew: false };
+    handleSaveClick({ row: newRow }).apply();
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
   };
@@ -177,6 +174,7 @@ export default function Table() {
   const columns = [
     { field: "id", headerName: "ID", type: "number", editable: false },
     { field: "slogan", headerName: "Slogan", flex: 1, editable: true },
+    { field: "company", headerName: "Company", flex: 1, editable: true },
     { field: "category", headerName: "Category", flex: 1, editable: true },
     { field: "source", headerName: "Source", flex: 1, editable: true },
     {
@@ -190,7 +188,7 @@ export default function Table() {
       headerName: "Date Updated",
       type: "date",
       flex: 1,
-      editable: true,
+      editable: false,
     },
     {
       field: "actions",
