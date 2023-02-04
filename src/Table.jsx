@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
-import { Container } from "@mui/material";
+import { Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -96,7 +96,6 @@ export default function Table() {
     fetchData();
   }, [getAccessTokenSilently]);
 
-  // TODO: Make the handlers actually do something
   const handleRowEditStart = (params, event) => {
     event.defaultMuiPrevented = true;
   };
@@ -174,7 +173,7 @@ export default function Table() {
   };
 
   const columns = [
-    { field: "id", headerName: "id", type: "number", editable: true },
+    { field: "id", headerName: "ID", type: "number", editable: false },
     { field: "slogan", headerName: "Slogan", flex: 1, editable: true },
     { field: "category", headerName: "Category", flex: 1, editable: true },
     { field: "source", headerName: "Source", flex: 1, editable: true },
@@ -238,7 +237,7 @@ export default function Table() {
   ];
 
   return (
-    <Container
+    <Box
       sx={{
         height: 750,
         width: "100%",
@@ -267,6 +266,6 @@ export default function Table() {
         }}
         experimentalFeatures={{ newEditingApi: true }}
       />
-    </Container>
+    </Box>
   );
 }
