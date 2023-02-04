@@ -1,10 +1,10 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import './index.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
 import { Auth0Provider } from "@auth0/auth0-react";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Auth0Provider
       domain="slogans.auth0.com"
@@ -16,5 +16,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     >
       <App />
     </Auth0Provider>
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);

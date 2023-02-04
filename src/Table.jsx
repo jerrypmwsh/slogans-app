@@ -1,19 +1,18 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import { Container } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
+import * as React from "react";
+import PropTypes from "prop-types";
+import Button from "@mui/material/Button";
+import { Container } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Close";
 import {
   GridRowModes,
   DataGrid,
   GridToolbarContainer,
   GridActionsCellItem,
-} from '@mui/x-data-grid';
+} from "@mui/x-data-grid";
 import { useAuth0 } from "@auth0/auth0-react";
 
 //const url = "https://hf07i6khm5.execute-api.us-west-2.amazonaws.com/api/slogans";
@@ -24,34 +23,33 @@ function EditToolbar(props) {
   const handleClick = async () => {
     try {
       const token = await getAccessTokenSilently({
-            audience: 'https://tresosos.com/slogans',
-        });
+        audience: "https://tresosos.com/slogans",
+      });
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            slogan: '[NEW]',
-            company: '[NEW]',
-            category: '[NEW]',
-            source: '[NEW]',
-            source_info: '[NEW]',
-            updated_date_time: Date.now()
-          })
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          slogan: "[NEW]",
+          company: "[NEW]",
+          category: "[NEW]",
+          source: "[NEW]",
+          source_info: "[NEW]",
+          updated_date_time: Date.now(),
+        }),
       });
       const json = await response.json();
       setRows((oldRows) => [json, ...oldRows]);
       const id = json.id;
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'slogan' },
-    }));
-  } catch (error) {
+      setRowModesModel((oldModel) => ({
+        ...oldModel,
+        [id]: { mode: GridRowModes.Edit, fieldToFocus: "slogan" },
+      }));
+    } catch (error) {
       console.error(error);
-  }
-    
+    }
   };
 
   return (
@@ -73,33 +71,30 @@ export default function Table() {
   const [rowModesModel, setRowModesModel] = React.useState({});
 
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
-  
-  React.useEffect(() => {
 
+  React.useEffect(() => {
     const fetchData = async () => {
-        try {
-          if (isAuthenticated){
-            setRows([])
-          }
-          const token = await getAccessTokenSilently({
-                audience: 'https://tresosos.com/slogans',
-            });
-          const response = await fetch(url, {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-                },
-          });
-          const json = await response.json();
-          setRows(json);
-          
-        } catch (error) {
-            console.error(error);
+      try {
+        if (isAuthenticated) {
+          setRows([]);
         }
+        const token = await getAccessTokenSilently({
+          audience: "https://tresosos.com/slogans",
+        });
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const json = await response.json();
+        setRows(json);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     fetchData();
-}, [getAccessTokenSilently]);
-
+  }, [getAccessTokenSilently]);
 
   // TODO: Make the handlers actually do something
   const handleRowEditStart = (params, event) => {
@@ -114,46 +109,49 @@ export default function Table() {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
 
-  const handleSaveClick =  (params) => async () => {
+  const handleSaveClick = (params) => async () => {
     try {
       const token = await getAccessTokenSilently({
-            audience: 'https://tresosos.com/slogans',
-        });
+        audience: "https://tresosos.com/slogans",
+      });
       const response = await fetch(`${url}/${params.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(params)
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
       });
       const json = await response.json();
       setRows((oldRows) => [json, ...oldRows]);
       const id = json.id;
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'slogan' },
-    }));
-  } catch (error) {
+      setRowModesModel((oldModel) => ({
+        ...oldModel,
+        [id]: { mode: GridRowModes.Edit, fieldToFocus: "slogan" },
+      }));
+    } catch (error) {
       console.error(error);
-  }
-    setRowModesModel({ ...rowModesModel, [params.row.id]: { mode: GridRowModes.View } });
+    }
+    setRowModesModel({
+      ...rowModesModel,
+      [params.row.id]: { mode: GridRowModes.View },
+    });
   };
 
   const handleDeleteClick = (id) => async () => {
     try {
       const token = await getAccessTokenSilently({
-            audience: 'https://tresosos.com/slogans',
-        });
-      const response = await fetch(`${url}/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+        audience: "https://tresosos.com/slogans",
       });
-  } catch (error) {
+      const response = await fetch(`${url}/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
       console.error(error);
-  }
+    }
     setRows(rows.filter((row) => row.id !== id));
   };
 
@@ -176,26 +174,32 @@ export default function Table() {
   };
 
   const columns = [
-    { field: 'id', headerName: 'id', type:'number', editable: true },
-    { field: 'slogan', headerName: 'Slogan', flex: 1, editable: true },
-    { field: 'category', headerName: 'Category', flex: 1, editable: true },
-    { field: 'source', headerName: 'Source', flex: 1, editable: true },
-    { field: 'source_info', headerName: 'Source Info', flex: 1, editable: true },
+    { field: "id", headerName: "id", type: "number", editable: true },
+    { field: "slogan", headerName: "Slogan", flex: 1, editable: true },
+    { field: "category", headerName: "Category", flex: 1, editable: true },
+    { field: "source", headerName: "Source", flex: 1, editable: true },
     {
-      field: 'update_date_time',
-      headerName: 'Date Updated',
-      type: 'date',
+      field: "source_info",
+      headerName: "Source Info",
       flex: 1,
       editable: true,
     },
     {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
+      field: "update_date_time",
+      headerName: "Date Updated",
+      type: "date",
       flex: 1,
-      cellClassName: 'actions',
+      editable: true,
+    },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      flex: 1,
+      cellClassName: "actions",
       getActions: (params) => {
-        const isInEditMode = rowModesModel[params.id]?.mode === GridRowModes.Edit;
+        const isInEditMode =
+          rowModesModel[params.id]?.mode === GridRowModes.Edit;
 
         if (isInEditMode) {
           return [
@@ -237,12 +241,12 @@ export default function Table() {
     <Container
       sx={{
         height: 750,
-        width: '100%',
-        '& .actions': {
-          color: 'text.secondary',
+        width: "100%",
+        "& .actions": {
+          color: "text.secondary",
         },
-        '& .textPrimary': {
-          color: 'text.primary',
+        "& .textPrimary": {
+          color: "text.primary",
         },
       }}
     >
