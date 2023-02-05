@@ -8,7 +8,7 @@ const LogoutButton = ({ img, alt }) => {
   return (
     <Button
       onClick={() =>
-        logout({ logoutParams: { returnTo: window.location.origin } })
+        logout({ logoutParams: { returnTo: window.location.href } })
       }
       startIcon={<Avatar src={img}></Avatar>}
       alt={alt}
