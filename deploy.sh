@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # abort on errors
-set -e
+set -ex
 
 # build
 npm run build
@@ -15,9 +15,10 @@ echo > .nojekyll
 # if you are deploying to a custom domain
 # echo 'www.example.com' > CNAME
 
-git init
-git checkout -B main
-git add -A
+cd -
+pwd
+git add -A .
+git status
 git commit -m 'deploy'
 
 # if you are deploying to https://jerrypmwsh.github.io
@@ -25,5 +26,3 @@ git commit -m 'deploy'
 
 # if you are deploying to https://jerrypmwsh.github.io/slogans-app
 git push -f https://github.com/jerrypmwsh/slogans-app.git.git main:gh-pages
-
-cd -
