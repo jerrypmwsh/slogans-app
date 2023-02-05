@@ -16,5 +16,7 @@ echo > .nojekyll
 # echo 'www.example.com' > CNAME
 
 cd -
+git add .
+git status
+git commit -m "[deploy]"
 npm run deploy
-
