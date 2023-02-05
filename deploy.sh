@@ -16,13 +16,5 @@ echo > .nojekyll
 # echo 'www.example.com' > CNAME
 
 cd -
-pwd
-git add -A .
-git status
-git commit -m 'deploy'
+npm run deploy
 
-# if you are deploying to https://jerrypmwsh.github.io
-# git push -f git@github.com:jerrypmwsh/<USERNAME>.github.io.git main
-
-# if you are deploying to https://jerrypmwsh.github.io/slogans-app
-git push
