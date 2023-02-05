@@ -16,8 +16,7 @@ import {
 } from "@mui/x-data-grid";
 import { useAuth0 } from "@auth0/auth0-react";
 
-//const url = "https://hf07i6khm5.execute-api.us-west-2.amazonaws.com/api/slogans";
-const url = "http://localhost:8000/slogans";
+const url = import.meta.env.VITE_SLOGAN_URL;
 function EditToolbar(props) {
   const { setRows, setRowModesModel } = props;
   const { getAccessTokenSilently } = useAuth0();
