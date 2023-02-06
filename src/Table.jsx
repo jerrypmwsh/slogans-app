@@ -143,13 +143,9 @@ export default function Table() {
         },
         body: JSON.stringify({ ...params.row, updated_date_time: Date.now() }),
       });
-      const json = await response.json();
-      setRows((oldRows) => [json, ...oldRows]);
-      const id = json.id;
-      setRowModesModel((oldModel) => ({
-        ...oldModel,
-        [id]: { mode: GridRowModes.Edit, fieldToFocus: "slogan" },
-      }));
+      if (!response.ok) {
+        setError({ message: response.text });
+      }
     } catch (error) {
       console.error(error);
       setError(error);
