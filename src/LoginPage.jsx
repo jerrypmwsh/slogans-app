@@ -14,7 +14,7 @@ export default function LoginPage() {
       >
         <Avatar
           variant="circular"
-          src="/logo.png"
+          src={`${window.location.origin}/slogans-app/logo.png`}
           style={{ width: "20%", height: "20%" }}
         />
         <LoginButton></LoginButton>
