@@ -13,7 +13,12 @@ import {
   GridToolbarContainer,
   GridActionsCellItem,
   GridToolbar,
+  gridPageCountSelector,
+  gridPageSelector,
+  useGridApiContext,
+  useGridSelector,
 } from "@mui/x-data-grid";
+import Pagination from "@mui/material/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
@@ -67,9 +72,25 @@ EditToolbar.propTypes = {
   setRows: PropTypes.func.isRequired,
 };
 
+function CustomPagination() {
+  const apiRef = useGridApiContext();
+  const page = useGridSelector(apiRef, gridPageSelector);
+  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+
+  return (
+    <Pagination
+      color="primary"
+      count={pageCount}
+      page={page + 1}
+      onChange={(event, value) => apiRef.current.setPage(value - 1)}
+    />
+  );
+}
+
 export default function Table() {
   const [rows, setRows] = React.useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
 
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
@@ -89,6 +110,7 @@ export default function Table() {
         });
         const json = await response.json();
         setRows(json);
+        setLoading(false);
       } catch (error) {
         console.error(error);
       }
@@ -259,10 +281,12 @@ export default function Table() {
         processRowUpdate={processRowUpdate}
         components={{
           Toolbar: EditToolbar,
+          Pagination: CustomPagination,
         }}
         componentsProps={{
           toolbar: { setRows, setRowModesModel },
         }}
+        loading={loading && isAuthenticated}
         experimentalFeatures={{ newEditingApi: true }}
       />
     </Box>
