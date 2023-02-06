@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
-import { Box } from "@mui/material";
+import { Box, Snackbar } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -20,6 +20,7 @@ import {
 } from "@mui/x-data-grid";
 import Pagination from "@mui/material/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
+import ErrorToast from "./ErrorToast";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 function EditToolbar(props) {
@@ -54,6 +55,7 @@ function EditToolbar(props) {
       }));
     } catch (error) {
       console.error(error);
+      setError(error);
     }
   };
 
@@ -91,7 +93,7 @@ export default function Table() {
   const [rows, setRows] = React.useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
   const [loading, setLoading] = React.useState(true);
-
+  const [error, setError] = React.useState({});
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   React.useEffect(() => {
@@ -113,6 +115,7 @@ export default function Table() {
         setLoading(false);
       } catch (error) {
         console.error(error);
+        setError(error);
       }
     };
 
@@ -149,6 +152,7 @@ export default function Table() {
       }));
     } catch (error) {
       console.error(error);
+      setError(error);
     }
     setRowModesModel({
       ...rowModesModel,
@@ -169,6 +173,7 @@ export default function Table() {
       });
     } catch (error) {
       console.error(error);
+      setError(error);
     }
     setRows(rows.filter((row) => row.id !== id));
   };
@@ -289,6 +294,7 @@ export default function Table() {
         loading={loading && isAuthenticated}
         experimentalFeatures={{ newEditingApi: true }}
       />
+      <ErrorToast error={error} setError={setError} />
     </Box>
   );
 }
