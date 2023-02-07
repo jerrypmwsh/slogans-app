@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
-import { Box, Snackbar } from "@mui/material";
+import { Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -23,6 +23,50 @@ import { useAuth0 } from "@auth0/auth0-react";
 import ErrorToast from "./ErrorToast";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
+
+// Unquote string (utility)
+function unquote(value) {
+  if (value.charAt(0) == '"' && value.charAt(value.length - 1) == '"')
+    return value.substring(1, value.length - 1);
+  return value;
+}
+
+// Parse a Link header
+function parseLinkHeader(header) {
+  if (header === null) {
+    return;
+  }
+  try {
+    var linkexp =
+      /<[^>]*>\s*(\s*;\s*[^\(\)<>@,;:"\/\[\]\?={} \t]+=(([^\(\)<>@,;:"\/\[\]\?={} \t]+)|("[^"]*")))*(,|$)/g;
+    var paramexp =
+      /[^\(\)<>@,;:"\/\[\]\?={} \t]+=(([^\(\)<>@,;:"\/\[\]\?={} \t]+)|("[^"]*"))/g;
+    var matches = header.match(linkexp);
+    var rels = new Object();
+    for (var i = 0; i < matches.length; i++) {
+      var split = matches[i].split(">");
+      var href = split[0].substring(1);
+      var ps = split[1];
+      var link = new Object();
+      link.href = href;
+      var s = ps.match(paramexp);
+      for (var j = 0; j < s.length; j++) {
+        var p = s[j];
+        var paramsplit = p.split("=");
+        var name = paramsplit[0];
+        link[name] = unquote(paramsplit[1]);
+      }
+
+      if (link.rel != undefined) {
+        rels[link.rel] = link;
+      }
+    }
+    return rels;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 function EditToolbar(props) {
   const { setRows, setRowModesModel } = props;
   const { getAccessTokenSilently } = useAuth0();
@@ -95,24 +139,31 @@ export default function Table() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState({});
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const [nextUrl, setNextUrl] = React.useState(`${url}?limit=5000`);
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        if (isAuthenticated) {
-          setRows([]);
-        }
         const token = await getAccessTokenSilently({
           audience: "https://tresosos.com/slogans",
         });
-        const response = await fetch(url, {
+        const response = await fetch(nextUrl, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
         const json = await response.json();
-        setRows(json);
+        setRows((oldRows) => [...oldRows, ...json]);
         setLoading(false);
+        const headers = response.headers;
+        const link = headers.get("link");
+        if (link !== undefined) {
+          const parsed = parseLinkHeader(link);
+          if (parsed !== undefined) {
+            setNextUrl(parsed["next"]["href"]);
+          }
+        }
       } catch (error) {
         console.error(error);
         setError(error);
@@ -120,7 +171,7 @@ export default function Table() {
     };
 
     fetchData();
-  }, [getAccessTokenSilently]);
+  }, [nextUrl]);
 
   const handleRowEditStart = (params, event) => {};
 
@@ -135,7 +186,7 @@ export default function Table() {
       const token = await getAccessTokenSilently({
         audience: "https://tresosos.com/slogans",
       });
-      const response = await fetch(`${url}/${params.id}`, {
+      const response = await fetch(`${url}/${params.row.id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
