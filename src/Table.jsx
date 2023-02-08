@@ -21,6 +21,7 @@ import {
 import Pagination from "@mui/material/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
 import ErrorToast from "./ErrorToast";
+import LoadingBackdrop from "./LoadingBackdrop";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
@@ -68,13 +69,14 @@ function parseLinkHeader(header) {
 }
 
 function EditToolbar(props) {
-  const { setRows, setRowModesModel } = props;
+  const { setRows, setRowModesModel, setShouldBlock } = props;
   const { getAccessTokenSilently } = useAuth0();
   const handleClick = async () => {
     try {
       const token = await getAccessTokenSilently({
         audience: "https://tresosos.com/slogans",
       });
+      setShouldBlock(true);
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -100,6 +102,8 @@ function EditToolbar(props) {
     } catch (error) {
       console.error(error);
       setError(error);
+    } finally {
+      setShouldBlock(false);
     }
   };
 
@@ -140,6 +144,7 @@ export default function Table() {
   const [error, setError] = React.useState({});
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [nextUrl, setNextUrl] = React.useState(`${url}?limit=5000`);
+  const [shouldBlock, setShouldBlock] = React.useState(false);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -186,6 +191,7 @@ export default function Table() {
       const token = await getAccessTokenSilently({
         audience: "https://tresosos.com/slogans",
       });
+      setShouldBlock(true);
       const response = await fetch(`${url}/${params.row.id}`, {
         method: "PUT",
         headers: {
@@ -200,6 +206,8 @@ export default function Table() {
     } catch (error) {
       console.error(error);
       setError(error);
+    } finally {
+      setShouldBlock(false);
     }
     setRowModesModel({
       ...rowModesModel,
@@ -212,6 +220,7 @@ export default function Table() {
       const token = await getAccessTokenSilently({
         audience: "https://tresosos.com/slogans",
       });
+      setShouldBlock(true);
       const response = await fetch(`${url}/${id}`, {
         method: "DELETE",
         headers: {
@@ -221,6 +230,8 @@ export default function Table() {
     } catch (error) {
       console.error(error);
       setError(error);
+    } finally {
+      setShouldBlock(false);
     }
     setRows(rows.filter((row) => row.id !== id));
   };
@@ -336,12 +347,13 @@ export default function Table() {
           Pagination: CustomPagination,
         }}
         componentsProps={{
-          toolbar: { setRows, setRowModesModel },
+          toolbar: { setRows, setRowModesModel, setShouldBlock },
         }}
         loading={loading && isAuthenticated}
         experimentalFeatures={{ newEditingApi: true }}
       />
       <ErrorToast error={error} setError={setError} />
+      <LoadingBackdrop open={shouldBlock}></LoadingBackdrop>
     </Box>
   );
 }
