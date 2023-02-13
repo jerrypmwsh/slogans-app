@@ -110,7 +110,7 @@ function EditToolbar(props) {
   return (
     <GridToolbarContainer>
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add record
+        Add Slogan
       </Button>
       <GridToolbar></GridToolbar>
     </GridToolbarContainer>
@@ -137,9 +137,28 @@ function CustomPagination() {
   );
 }
 
+function extractSelectOptions(slogans) {
+  const categories = new Set();
+  const sources = new Set();
+  slogans.forEach((s) => {
+    categories.add(s.category);
+    sources.add(s.source);
+  });
+  return { categories, sources };
+}
+
+function merge(a, b) {
+  const c = new Set();
+  a.forEach((element) => c.add(element));
+  b.forEach((element) => c.add(element));
+  return c;
+}
+
 export default function Table() {
   const [rows, setRows] = React.useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
+  const [categoryOptions, setCategoryOptions] = React.useState([]);
+  const [sourceOptions, setSourceOptions] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState({});
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -160,6 +179,9 @@ export default function Table() {
 
         const json = await response.json();
         setRows((oldRows) => [...oldRows, ...json]);
+        const { categories, sources } = extractSelectOptions(json);
+        setCategoryOptions((oldCategories) => merge(oldCategories, categories));
+        setSourceOptions((oldSources) => merge(oldSources, sources));
         setLoading(false);
         const headers = response.headers;
         const link = headers.get("link");
@@ -259,8 +281,22 @@ export default function Table() {
     { field: "id", headerName: "ID", type: "number", editable: false },
     { field: "slogan", headerName: "Slogan", flex: 1, editable: true },
     { field: "company", headerName: "Company", flex: 1, editable: true },
-    { field: "category", headerName: "Category", flex: 1, editable: true },
-    { field: "source", headerName: "Source", flex: 1, editable: true },
+    {
+      field: "category",
+      headerName: "Category",
+      type: "singleSelect",
+      valueOptions: [...categoryOptions],
+      flex: 1,
+      editable: true,
+    },
+    {
+      field: "source",
+      headerName: "Source",
+      type: "singleSelect",
+      valueOptions: [...sourceOptions],
+      flex: 1,
+      editable: true,
+    },
     {
       field: "source_info",
       headerName: "Source Info",
