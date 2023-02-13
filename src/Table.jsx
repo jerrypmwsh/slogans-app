@@ -162,7 +162,7 @@ export default function Table() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState({});
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
-  const [nextUrl, setNextUrl] = React.useState(`${url}?limit=5000`);
+  const [nextUrl, setNextUrl] = React.useState(`${url}?limit=1000`);
   const [shouldBlock, setShouldBlock] = React.useState(false);
 
   React.useEffect(() => {
