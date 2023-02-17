@@ -1,12 +1,14 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
-import { Box } from "@mui/material";
+import { Box, Container, TextField, Typography } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
+import { styled } from "@mui/material/styles";
 import {
   GridRowModes,
   DataGrid,
@@ -22,6 +24,7 @@ import Pagination from "@mui/material/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
 import ErrorToast from "./ErrorToast";
 import LoadingBackdrop from "./LoadingBackdrop";
+import AutocompleteCell from "./AutocompleteCell";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
@@ -69,7 +72,7 @@ function parseLinkHeader(header) {
 }
 
 function EditToolbar(props) {
-  const { setRows, setRowModesModel, setShouldBlock } = props;
+  const { setRows, setRowModesModel, setShouldBlock, setCount } = props;
   const { getAccessTokenSilently } = useAuth0();
   const handleClick = async () => {
     try {
@@ -99,6 +102,7 @@ function EditToolbar(props) {
         ...oldModel,
         [id]: { mode: GridRowModes.Edit, fieldToFocus: "slogan" },
       }));
+      setCount((count) => count + 1);
     } catch (error) {
       console.error(error);
       setError(error);
@@ -165,6 +169,8 @@ export default function Table() {
   const [nextUrl, setNextUrl] = React.useState(`${url}?limit=1000`);
   const [shouldBlock, setShouldBlock] = React.useState(false);
 
+  const [count, setCount] = React.useState(0);
+
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -178,7 +184,11 @@ export default function Table() {
         });
 
         const json = await response.json();
-        setRows((oldRows) => [...oldRows, ...json]);
+        setRows((oldRows) => {
+          const newRows = [...oldRows, ...json];
+          setCount(newRows.length);
+          return newRows;
+        });
         const { categories, sources } = extractSelectOptions(json);
         setCategoryOptions((oldCategories) => merge(oldCategories, categories));
         setSourceOptions((oldSources) => merge(oldSources, sources));
@@ -249,6 +259,7 @@ export default function Table() {
           Authorization: `Bearer ${token}`,
         },
       });
+      setCount((count) => count - 1);
     } catch (error) {
       console.error(error);
       setError(error);
@@ -279,8 +290,8 @@ export default function Table() {
 
   const columns = [
     { field: "id", headerName: "ID", type: "number", editable: false },
-    { field: "slogan", headerName: "Slogan", flex: 1, editable: true },
-    { field: "company", headerName: "Company", flex: 1, editable: true },
+    { field: "slogan", headerName: "Slogan", flex: 3, editable: true },
+    { field: "company", headerName: "Company", flex: 2, editable: true },
     {
       field: "category",
       headerName: "Category",
@@ -288,6 +299,9 @@ export default function Table() {
       valueOptions: [...categoryOptions].sort(),
       flex: 1,
       editable: true,
+      renderEditCell: (params) => {
+        return <AutocompleteCell {...params} />;
+      },
     },
     {
       field: "source",
@@ -296,6 +310,9 @@ export default function Table() {
       valueOptions: [...sourceOptions].sort(),
       flex: 1,
       editable: true,
+      renderEditCell: (params) => {
+        return <AutocompleteCell {...params} />;
+      },
     },
     {
       field: "source_info",
@@ -362,10 +379,10 @@ export default function Table() {
         height: 750,
         width: "100%",
         "& .actions": {
-          color: "text.secondary",
+          color: "secondary",
         },
         "& .textPrimary": {
-          color: "text.primary",
+          color: "primary",
         },
       }}
     >
@@ -383,13 +400,32 @@ export default function Table() {
           Pagination: CustomPagination,
         }}
         componentsProps={{
-          toolbar: { setRows, setRowModesModel, setShouldBlock },
+          toolbar: { setRows, setRowModesModel, setShouldBlock, setCount },
+          AutocompleteCell: { categoryOptions },
         }}
         loading={loading && isAuthenticated}
         experimentalFeatures={{ newEditingApi: true }}
+        hideFooterSelectedRowCount
       />
+      <Container align="right">
+        <Typography variant="body2">{count}</Typography>
+      </Container>
+
       <ErrorToast error={error} setError={setError} />
       <LoadingBackdrop open={shouldBlock}></LoadingBackdrop>
     </Box>
   );
 }
+
+const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
+  height: "100%",
+  [`& .${autocompleteClasses.inputRoot}`]: {
+    ...theme.typography.body2,
+    padding: "1px 0",
+    height: "100%",
+    "& input": {
+      padding: "0 16px",
+      height: "100%",
+    },
+  },
+}));
