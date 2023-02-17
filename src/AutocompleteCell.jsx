@@ -9,7 +9,9 @@ export default function AutocompleteCell(props) {
     <Autocomplete
       value={value}
       options={colDef.valueOptions}
-      renderInput={(params) => <TextField {...params} />}
+      renderInput={(params) => (
+        <TextField {...params} variant="standard" size="small" />
+      )}
       onChange={(event) => {
         apiRef.current.setEditCellValue({
           id,
@@ -18,6 +20,7 @@ export default function AutocompleteCell(props) {
         });
       }}
       fullWidth
+      disableClearable
     ></Autocomplete>
   );
 }

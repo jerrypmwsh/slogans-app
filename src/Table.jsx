@@ -297,7 +297,7 @@ export default function Table() {
       headerName: "Category",
       type: "singleSelect",
       valueOptions: [...categoryOptions].sort(),
-      flex: 1,
+      flex: 2,
       editable: true,
       renderEditCell: (params) => {
         return <AutocompleteCell {...params} />;
@@ -308,7 +308,7 @@ export default function Table() {
       headerName: "Source",
       type: "singleSelect",
       valueOptions: [...sourceOptions].sort(),
-      flex: 1,
+      flex: 2,
       editable: true,
       renderEditCell: (params) => {
         return <AutocompleteCell {...params} />;
@@ -317,6 +317,7 @@ export default function Table() {
     {
       field: "source_info",
       headerName: "Source Info",
+      type: "string",
       flex: 1,
       editable: true,
     },
