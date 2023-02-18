@@ -284,7 +284,6 @@ export default function Table() {
   const processRowUpdate = (newRow) => {
     const updatedRow = { ...newRow, isNew: false };
     handleSaveClick({ row: newRow }).apply();
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     return updatedRow;
   };
 
@@ -343,7 +342,12 @@ export default function Table() {
             <GridActionsCellItem
               icon={<SaveIcon />}
               label="Save"
-              onClick={handleSaveClick(params)}
+              onClick={() =>
+                setRowModesModel({
+                  ...rowModesModel,
+                  [params.row.id]: { mode: GridRowModes.View },
+                })
+              }
             />,
             <GridActionsCellItem
               icon={<CancelIcon />}
