@@ -15,6 +15,7 @@ import {
   GridToolbarContainer,
   GridActionsCellItem,
   GridToolbar,
+  gridExpandedRowCountSelector,
   gridPageCountSelector,
   gridPageSelector,
   useGridApiContext,
@@ -139,6 +140,12 @@ function CustomPagination() {
       onChange={(event, value) => apiRef.current.setPage(value - 1)}
     />
   );
+}
+
+function Footer() {
+  const apiRef = useGridApiContext();
+  const rowCount = useGridSelector(apiRef, gridExpandedRowCountSelector);
+  return <Box sx={{ p: 1, display: "flex" }}>{rowCount}</Box>;
 }
 
 function extractSelectOptions(slogans) {
@@ -324,6 +331,7 @@ export default function Table() {
       field: "update_date_time",
       headerName: "Date Updated",
       type: "date",
+      valueGetter: (params) => new Date(params.row.update_date_time),
       flex: 1,
       editable: false,
     },
