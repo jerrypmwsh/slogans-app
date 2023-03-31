@@ -73,7 +73,7 @@ function parseLinkHeader(header) {
 }
 
 function EditToolbar(props) {
-  const { setRows, setRowModesModel, setShouldBlock, setCount } = props;
+  const { setRows, setRowModesModel, setShouldBlock } = props;
   const { getAccessTokenSilently } = useAuth0();
   const handleClick = async () => {
     try {
@@ -103,7 +103,6 @@ function EditToolbar(props) {
         ...oldModel,
         [id]: { mode: GridRowModes.Edit, fieldToFocus: "slogan" },
       }));
-      setCount((count) => count + 1);
     } catch (error) {
       console.error(error);
       setError(error);
@@ -145,7 +144,14 @@ function CustomPagination() {
 function Footer() {
   const apiRef = useGridApiContext();
   const rowCount = useGridSelector(apiRef, gridExpandedRowCountSelector);
-  return <Box sx={{ p: 1, display: "flex" }}>{rowCount}</Box>;
+  return (
+    <Box sx={{ p: 1, display: "flex" }}>
+      {" "}
+      <Container align="right">
+        <Typography variant="body2">{rowCount}</Typography>
+      </Container>
+    </Box>
+  );
 }
 
 function extractSelectOptions(slogans) {
@@ -176,8 +182,6 @@ export default function Table() {
   const [nextUrl, setNextUrl] = React.useState(`${url}?limit=1000`);
   const [shouldBlock, setShouldBlock] = React.useState(false);
 
-  const [count, setCount] = React.useState(0);
-
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -193,7 +197,6 @@ export default function Table() {
         const json = await response.json();
         setRows((oldRows) => {
           const newRows = [...oldRows, ...json];
-          setCount(newRows.length);
           return newRows;
         });
         const { categories, sources } = extractSelectOptions(json);
@@ -266,7 +269,6 @@ export default function Table() {
           Authorization: `Bearer ${token}`,
         },
       });
-      setCount((count) => count - 1);
     } catch (error) {
       console.error(error);
       setError(error);
@@ -411,18 +413,16 @@ export default function Table() {
         components={{
           Toolbar: EditToolbar,
           Pagination: CustomPagination,
+          Footer: Footer,
         }}
         componentsProps={{
-          toolbar: { setRows, setRowModesModel, setShouldBlock, setCount },
+          toolbar: { setRows, setRowModesModel, setShouldBlock },
           AutocompleteCell: { categoryOptions },
         }}
         loading={loading && isAuthenticated}
         experimentalFeatures={{ newEditingApi: true }}
         hideFooterSelectedRowCount
       />
-      <Container align="right">
-        <Typography variant="body2">{count}</Typography>
-      </Container>
 
       <ErrorToast error={error} setError={setError} />
       <LoadingBackdrop open={shouldBlock}></LoadingBackdrop>
