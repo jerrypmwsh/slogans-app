@@ -5,10 +5,10 @@ import "./index.css";
 import { ThemeProvider } from "@mui/material";
 import { appTheme } from "./Theme";
 import { Auth0Provider } from "@auth0/auth0-react";
-import { createHashRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./LoginPage";
 
-const router = createHashRouter([
+const router = createBrowserRouter([
   {
     path: "/slogans-app",
     element: <LoginPage></LoginPage>,
@@ -26,7 +26,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       clientId="KvRHjbjqF7kjvpm3jnXixUcazvGbVO7k"
       authorizationParams={{
         audience: "https://tresosos.com/slogans",
-        redirect_uri: `${window.location.origin}/slogans-app/#/slogans-app/`,
+        redirect_uri: `${window.location.origin}/slogans-app/`,
       }}
     >
       <ThemeProvider theme={appTheme}>
