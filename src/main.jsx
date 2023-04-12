@@ -7,6 +7,7 @@ import { appTheme } from "./Theme";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./LoginPage";
+import Dashboard from "./Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
   {
     path: "/slogans-app/slogans",
     element: <App />,
+  },
+  {
+    path: "/slogans-app/dashboard",
+    element: <Dashboard />,
   },
 ]);
 
