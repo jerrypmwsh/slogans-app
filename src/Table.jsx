@@ -126,30 +126,26 @@ EditToolbar.propTypes = {
   setRows: PropTypes.func.isRequired,
 };
 
-function CustomPagination() {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      color="primary"
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
-  );
-}
-
 function Footer() {
   const apiRef = useGridApiContext();
   const rowCount = useGridSelector(apiRef, gridExpandedRowCountSelector);
+  const page = useGridSelector(apiRef, gridPageSelector);
+  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
   return (
-    <Box sx={{ p: 1, display: "flex" }}>
-      {" "}
-      <Container align="right">
-        <Typography variant="body2">{rowCount}</Typography>
-      </Container>
+    <Box
+      sx={{
+        p: 1,
+        display: "flex",
+        justifyContent: "space-between",
+      }}
+    >
+      <Pagination
+        color="primary"
+        count={pageCount}
+        page={page + 1}
+        onChange={(event, value) => apiRef.current.setPage(value - 1)}
+      />
+      <Typography variant="body2">{rowCount}</Typography>
     </Box>
   );
 }
@@ -412,7 +408,6 @@ export default function Table() {
         processRowUpdate={processRowUpdate}
         components={{
           Toolbar: EditToolbar,
-          Pagination: CustomPagination,
           Footer: Footer,
         }}
         componentsProps={{
