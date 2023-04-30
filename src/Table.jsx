@@ -195,6 +195,7 @@ export default function Table() {
           const newRows = [...oldRows, ...json];
           return newRows;
         });
+        //TODO: just use an api method to get the source and category options.
         const { categories, sources } = extractSelectOptions(json);
         setCategoryOptions((oldCategories) => merge(oldCategories, categories));
         setSourceOptions((oldSources) => merge(oldSources, sources));
