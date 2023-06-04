@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
-import { Box, Container, TextField, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -150,23 +150,6 @@ function Footer() {
   );
 }
 
-function extractSelectOptions(slogans) {
-  const categories = new Set();
-  const sources = new Set();
-  slogans.forEach((s) => {
-    categories.add(s.category);
-    sources.add(s.source);
-  });
-  return { categories, sources };
-}
-
-function merge(a, b) {
-  const c = new Set();
-  a.forEach((element) => c.add(element));
-  b.forEach((element) => c.add(element));
-  return c;
-}
-
 export default function Table() {
   const [rows, setRows] = React.useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
@@ -195,10 +178,6 @@ export default function Table() {
           const newRows = [...oldRows, ...json];
           return newRows;
         });
-        //TODO: just use an api method to get the source and category options.
-        const { categories, sources } = extractSelectOptions(json);
-        setCategoryOptions((oldCategories) => merge(oldCategories, categories));
-        setSourceOptions((oldSources) => merge(oldSources, sources));
         setLoading(false);
         const headers = response.headers;
         const link = headers.get("link");
@@ -216,6 +195,50 @@ export default function Table() {
 
     fetchData();
   }, [nextUrl]);
+
+  React.useEffect(() => {
+    const fetchCategoryOptions = async () => {
+      try {
+        const token = await getAccessTokenSilently({
+          audience: "https://tresosos.com/slogans",
+        });
+        const response = await fetch(`${url}/categories`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const json = await response.json();
+        setCategoryOptions(Object.keys(json));
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      }
+    };
+    fetchCategoryOptions();
+  }, []);
+
+  React.useEffect(() => {
+    const fetchSourceOptions = async () => {
+      try {
+        const token = await getAccessTokenSilently({
+          audience: "https://tresosos.com/slogans",
+        });
+        const response = await fetch(`${url}/sources`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const json = await response.json();
+        setSourceOptions(Object.keys(json));
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      }
+    };
+    fetchSourceOptions();
+  }, []);
 
   const handleRowEditStart = (params, event) => {};
 
