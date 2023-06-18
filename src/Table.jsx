@@ -81,30 +81,6 @@ EditToolbar.propTypes = {
   setRows: PropTypes.func.isRequired,
 };
 
-function Footer() {
-  const apiRef = useGridApiContext();
-  const rowCount = useGridSelector(apiRef, gridExpandedRowCountSelector);
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-  return (
-    <Box
-      sx={{
-        p: 1,
-        display: "flex",
-        justifyContent: "space-between",
-      }}
-    >
-      <Pagination
-        color="primary"
-        count={pageCount}
-        page={page + 1}
-        onChange={(event, value) => apiRef.current.setPage(value - 1)}
-      />
-      <Typography variant="body2">{rowCount}</Typography>
-    </Box>
-  );
-}
-
 export default function Table() {
   const [rows, setRows] = React.useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
@@ -371,8 +347,7 @@ export default function Table() {
         onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
         slots={{
-          Toolbar: EditToolbar,
-          Footer: Footer,
+          toolbar: EditToolbar,
           loadingOverlay: LinearProgress,
         }}
         slotProps={{
