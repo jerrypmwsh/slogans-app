@@ -376,6 +376,14 @@ export default function Table() {
       <DataGrid
         rows={rows}
         columns={columns}
+        initialState={{
+          columns: {
+            columnVisibilityModel: {
+              source_info: false,
+              update_date_time: false,
+            },
+          },
+        }}
         editMode="row"
         rowModesModel={rowModesModel}
         onRowModesModelChange={(newModel) => setRowModesModel(newModel)}
