@@ -1,5 +1,7 @@
+import * as React from "react";
 import { ResponsiveTreeMap } from "@nivo/treemap";
 import { Box } from "@mui/material";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const rawData = {
   Veterinarians: 1,
@@ -299,6 +301,8 @@ const rawData = {
   "Dishwashing Liquid": 4,
 };
 
+const url = import.meta.env.VITE_SLOGAN_URL;
+
 var colorIncrement = 30;
 var timesCalled = 0;
 function gimmeAColor() {
@@ -325,6 +329,29 @@ function toNivoData(d) {
 }
 
 export default function Dashboard() {
+  const [categories, setCategories] = React.useState([]);
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = await getAccessTokenSilently({
+          audience: "https://tresosos.com/slogans",
+        });
+        const response = await fetch(`${url}/categories`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const json = await response.json();
+        setCategories(toNivoData(rawData));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <Box
       sx={{
@@ -339,7 +366,7 @@ export default function Dashboard() {
       }}
     >
       <ResponsiveTreeMap
-        data={toNivoData(rawData)}
+        data={categories}
         identity="name"
         value="loc"
         valueFormat=".02s"
