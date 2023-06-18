@@ -2,13 +2,11 @@ import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import { Box, Typography } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
-import { styled } from "@mui/material/styles";
 import {
   GridRowModes,
   DataGrid,
@@ -28,13 +26,6 @@ import LoadingBackdrop from "./LoadingBackdrop";
 import AutocompleteCell from "./AutocompleteCell";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
-
-// Unquote string (utility)
-function unquote(value) {
-  if (value.charAt(0) == '"' && value.charAt(value.length - 1) == '"')
-    return value.substring(1, value.length - 1);
-  return value;
-}
 
 function EditToolbar(props) {
   const { setRows, setRowModesModel, setShouldBlock } = props;
@@ -397,16 +388,3 @@ export default function Table() {
     </div>
   );
 }
-
-const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
-  height: "100%",
-  [`& .${autocompleteClasses.inputRoot}`]: {
-    ...theme.typography.body2,
-    padding: "1px 0",
-    height: "100%",
-    "& input": {
-      padding: "0 16px",
-      height: "100%",
-    },
-  },
-}));
