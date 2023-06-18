@@ -2,6 +2,7 @@ import * as React from "react";
 import { ResponsiveTreeMap } from "@nivo/treemap";
 import { Box } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
+import { Navigate } from "react-router-dom";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
@@ -33,6 +34,9 @@ function toNivoData(d) {
 export default function Dashboard() {
   const [categories, setCategories] = React.useState([]);
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  if (!isAuthenticated) {
+    return <Navigate to="/slogans-app" />;
+  }
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -44,7 +48,6 @@ export default function Dashboard() {
             Authorization: `Bearer ${token}`,
           },
         });
-
         const json = await response.json();
         setCategories(toNivoData(json));
       } catch (error) {
@@ -59,12 +62,6 @@ export default function Dashboard() {
       sx={{
         height: 750,
         width: "100%",
-        "& .actions": {
-          color: "secondary",
-        },
-        "& .textPrimary": {
-          color: "primary",
-        },
       }}
     >
       <ResponsiveTreeMap

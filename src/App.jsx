@@ -1,6 +1,4 @@
 import "./App.css";
-import { Container } from "@mui/material";
-import NavBar from "./NavBar";
 import Table from "./Table";
 import { Navigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -10,12 +8,7 @@ function App() {
   if (!isAuthenticated) {
     return <Navigate to="/slogans-app/" />;
   }
-  return (
-    <Container>
-      <NavBar></NavBar>
-      <Table></Table>
-    </Container>
-  );
+  return <Table></Table>;
 }
 
 export default App;

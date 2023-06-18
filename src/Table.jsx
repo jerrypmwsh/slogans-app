@@ -361,18 +361,7 @@ export default function Table() {
   ];
 
   return (
-    <Box
-      sx={{
-        height: 750,
-        width: "100%",
-        "& .actions": {
-          color: "secondary",
-        },
-        "& .textPrimary": {
-          color: "primary",
-        },
-      }}
-    >
+    <div>
       <DataGrid
         rows={rows}
         columns={columns}
@@ -405,7 +394,7 @@ export default function Table() {
 
       <ErrorToast error={error} setError={setError} />
       <LoadingBackdrop open={shouldBlock}></LoadingBackdrop>
-    </Box>
+    </div>
   );
 }
 

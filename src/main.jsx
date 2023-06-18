@@ -5,9 +5,19 @@ import "./index.css";
 import { ThemeProvider } from "@mui/material";
 import { appTheme } from "./Theme";
 import { Auth0Provider } from "@auth0/auth0-react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import LoginPage from "./LoginPage";
 import Dashboard from "./Dashboard";
+import NavBar from "./NavBar";
+
+const Layout = () => (
+  <div>
+    <header>
+      <NavBar />
+    </header>
+    <Outlet />
+  </div>
+);
 
 const router = createBrowserRouter([
   {
@@ -15,12 +25,17 @@ const router = createBrowserRouter([
     element: <LoginPage></LoginPage>,
   },
   {
-    path: "/slogans-app/slogans",
-    element: <App />,
-  },
-  {
-    path: "/slogans-app/dashboard",
-    element: <Dashboard />,
+    element: <Layout />,
+    children: [
+      {
+        path: "/slogans-app/slogans",
+        element: <App />,
+      },
+      {
+        path: "/slogans-app/dashboard",
+        element: <Dashboard />,
+      },
+    ],
   },
 ]);
 
