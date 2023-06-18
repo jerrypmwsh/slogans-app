@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
-import { Box, Typography } from "@mui/material";
+import { Box, LinearProgress, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -370,11 +370,12 @@ export default function Table() {
         onRowEditStart={handleRowEditStart}
         onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
-        components={{
+        slots={{
           Toolbar: EditToolbar,
           Footer: Footer,
+          loadingOverlay: LinearProgress,
         }}
-        componentsProps={{
+        slotProps={{
           toolbar: { setRows, setRowModesModel, setShouldBlock },
           AutocompleteCell: { categoryOptions },
         }}
