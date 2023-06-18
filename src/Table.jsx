@@ -36,42 +36,6 @@ function unquote(value) {
   return value;
 }
 
-// Parse a Link header
-function parseLinkHeader(header) {
-  if (header === null) {
-    return;
-  }
-  try {
-    var linkexp =
-      /<[^>]*>\s*(\s*;\s*[^\(\)<>@,;:"\/\[\]\?={} \t]+=(([^\(\)<>@,;:"\/\[\]\?={} \t]+)|("[^"]*")))*(,|$)/g;
-    var paramexp =
-      /[^\(\)<>@,;:"\/\[\]\?={} \t]+=(([^\(\)<>@,;:"\/\[\]\?={} \t]+)|("[^"]*"))/g;
-    var matches = header.match(linkexp);
-    var rels = new Object();
-    for (var i = 0; i < matches.length; i++) {
-      var split = matches[i].split(">");
-      var href = split[0].substring(1);
-      var ps = split[1];
-      var link = new Object();
-      link.href = href;
-      var s = ps.match(paramexp);
-      for (var j = 0; j < s.length; j++) {
-        var p = s[j];
-        var paramsplit = p.split("=");
-        var name = paramsplit[0];
-        link[name] = unquote(paramsplit[1]);
-      }
-
-      if (link.rel != undefined) {
-        rels[link.rel] = link;
-      }
-    }
-    return rels;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 function EditToolbar(props) {
   const { setRows, setRowModesModel, setShouldBlock } = props;
   const { getAccessTokenSilently } = useAuth0();
@@ -158,7 +122,6 @@ export default function Table() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState({});
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
-  const [nextUrl, setNextUrl] = React.useState(`${url}?limit=1000`);
   const [shouldBlock, setShouldBlock] = React.useState(false);
 
   React.useEffect(() => {
@@ -167,26 +130,15 @@ export default function Table() {
         const token = await getAccessTokenSilently({
           audience: "https://tresosos.com/slogans",
         });
-        const response = await fetch(nextUrl, {
+        const response = await fetch(url, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         const json = await response.json();
-        setRows((oldRows) => {
-          const newRows = [...oldRows, ...json];
-          return newRows;
-        });
+        setRows(json);
         setLoading(false);
-        const headers = response.headers;
-        const link = headers.get("link");
-        if (link !== undefined) {
-          const parsed = parseLinkHeader(link);
-          if (parsed !== undefined) {
-            setNextUrl(parsed["next"]["href"]);
-          }
-        }
       } catch (error) {
         console.error(error);
         setError(error);
@@ -194,7 +146,7 @@ export default function Table() {
     };
 
     fetchData();
-  }, [nextUrl]);
+  }, []);
 
   React.useEffect(() => {
     const fetchCategoryOptions = async () => {
