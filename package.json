@@ -14,7 +14,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.13.5",
+    "@mui/material": "^5.13.6",
     "@mui/system": "^5.13.5",
     "@mui/x-data-grid": "^6.8.0",
     "@nivo/core": "^0.83.0",
