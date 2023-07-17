@@ -28,7 +28,7 @@
   },
   "devDependencies": {
 
-    "@types/react": "^18.2.13",
+    "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.6",
     "@vitejs/plugin-react": "^4.0.0",
     "push-dir": "^0.4.1",
