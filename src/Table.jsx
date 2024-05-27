@@ -43,11 +43,11 @@ function EditToolbar(props) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          slogan: "[NEW]",
-          company: "[NEW]",
-          category: "[NEW]",
-          source: "[NEW]",
-          source_info: "[NEW]",
+          slogan: "",
+          company: "",
+          category: "",
+          source: "",
+          source_info: "",
           updated_date_time: Date.now(),
         }),
       });
