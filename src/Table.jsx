@@ -241,7 +241,7 @@ export default function Table() {
     { field: "company", headerName: "Company", flex: 2, editable: true },
     {
       field: "category",
-      headerName: "Category",
+      headerName: "Product/Category",
       type: "singleSelect",
       valueOptions: [...categoryOptions].sort(),
       flex: 2,
