@@ -335,6 +335,7 @@ export default function Table() {
         initialState={{
           columns: {
             columnVisibilityModel: {
+              id: false,
               source_info: false,
               update_date_time: false,
             },
