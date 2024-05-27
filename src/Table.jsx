@@ -272,7 +272,7 @@ export default function Table() {
       field: "update_date_time",
       headerName: "Date Updated",
       type: "date",
-      valueGetter: (params) => new Date(params.row.update_date_time),
+      valueGetter: (value, row) => new Date(row.update_date_time),
       flex: 1,
       editable: false,
     },
@@ -282,9 +282,8 @@ export default function Table() {
       headerName: "Actions",
       flex: 1,
       cellClassName: "actions",
-      getActions: (params) => {
-        const isInEditMode =
-          rowModesModel[params.id]?.mode === GridRowModes.Edit;
+      getActions: ({ id }) => {
+        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
         if (isInEditMode) {
           return [
@@ -294,7 +293,7 @@ export default function Table() {
               onClick={() =>
                 setRowModesModel({
                   ...rowModesModel,
-                  [params.row.id]: { mode: GridRowModes.View },
+                  [id]: { mode: GridRowModes.View },
                 })
               }
             />,
@@ -302,7 +301,7 @@ export default function Table() {
               icon={<CancelIcon />}
               label="Cancel"
               className="textPrimary"
-              onClick={handleCancelClick(params.id)}
+              onClick={handleCancelClick(id)}
               color="inherit"
             />,
           ];
@@ -313,13 +312,13 @@ export default function Table() {
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
-            onClick={handleEditClick(params.id)}
+            onClick={handleEditClick(id)}
             color="inherit"
           />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete"
-            onClick={handleDeleteClick(params.id)}
+            onClick={handleDeleteClick(id)}
             color="inherit"
           />,
         ];
