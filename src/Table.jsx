@@ -340,8 +340,6 @@ export default function Table() {
           columns: {
             columnVisibilityModel: {
               id: false,
-              source_info: false,
-              update_date_time: false,
             },
           },
         }}
