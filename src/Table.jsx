@@ -238,10 +238,15 @@ export default function Table() {
   const columns = [
     { field: "id", headerName: "ID", type: "number", editable: false },
     { field: "slogan", headerName: "Slogan", flex: 3, editable: true },
-    { field: "company", headerName: "Company", flex: 2, editable: true },
+    {
+      field: "company",
+      headerName: "Product/Company",
+      flex: 2,
+      editable: true,
+    },
     {
       field: "category",
-      headerName: "Product/Category",
+      headerName: "Category",
       type: "singleSelect",
       valueOptions: [...categoryOptions].sort(),
       flex: 2,
