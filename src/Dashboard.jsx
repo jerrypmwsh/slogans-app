@@ -43,7 +43,7 @@ export default function Dashboard() {
         const token = await getAccessTokenSilently({
           audience: "https://tresosos.com/slogans",
         });
-        const response = await fetch(`${url}/categories`, {
+        const response = await fetch(`${url}/slogans/categories`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
