@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
-import { Box, LinearProgress, Typography } from "@mui/material";
+import { LinearProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -13,13 +13,7 @@ import {
   GridToolbarContainer,
   GridActionsCellItem,
   GridToolbar,
-  gridExpandedRowCountSelector,
-  gridPageCountSelector,
-  gridPageSelector,
-  useGridApiContext,
-  useGridSelector,
 } from "@mui/x-data-grid";
-import Pagination from "@mui/material/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
 import ErrorToast from "./ErrorToast";
 import LoadingBackdrop from "./LoadingBackdrop";
@@ -36,7 +30,7 @@ function EditToolbar(props) {
         audience: "https://tresosos.com/slogans",
       });
       setShouldBlock(true);
-      const response = await fetch(url, {
+      const response = await fetch(`${url}/slogans`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -45,8 +39,8 @@ function EditToolbar(props) {
         body: JSON.stringify({
           slogan: "",
           company: "",
-          category: "",
-          source: "",
+          category_id: 0,
+          source_id: 0,
           source_info: "",
           updated_date_time: Date.now(),
         }),
@@ -84,8 +78,8 @@ EditToolbar.propTypes = {
 export default function Table() {
   const [rows, setRows] = React.useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
-  const [categoryOptions, setCategoryOptions] = React.useState([]);
-  const [sourceOptions, setSourceOptions] = React.useState([]);
+  const [categoryOptions, setCategoryOptions] = React.useState({});
+  const [sourceOptions, setSourceOptions] = React.useState({});
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState({});
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -97,7 +91,7 @@ export default function Table() {
         const token = await getAccessTokenSilently({
           audience: "https://tresosos.com/slogans",
         });
-        const response = await fetch(url, {
+        const response = await fetch(`${url}slogans`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -121,14 +115,18 @@ export default function Table() {
         const token = await getAccessTokenSilently({
           audience: "https://tresosos.com/slogans",
         });
-        const response = await fetch(`${url}/categories`, {
+        const response = await fetch(`${url}categories`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         const json = await response.json();
-        setCategoryOptions(Object.keys(json));
+        const object = json.reduce(
+          (obj, item) => ((obj[item.category] = item.id), obj),
+          {}
+        );
+        setCategoryOptions(object);
       } catch (error) {
         console.error(error);
         setError(error);
@@ -143,14 +141,18 @@ export default function Table() {
         const token = await getAccessTokenSilently({
           audience: "https://tresosos.com/slogans",
         });
-        const response = await fetch(`${url}/sources`, {
+        const response = await fetch(`${url}sources`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         const json = await response.json();
-        setSourceOptions(Object.keys(json));
+        const object = json.reduce(
+          (obj, item) => ((obj[item.source] = item.id), obj),
+          {}
+        );
+        setSourceOptions(object);
       } catch (error) {
         console.error(error);
         setError(error);
@@ -173,13 +175,17 @@ export default function Table() {
         audience: "https://tresosos.com/slogans",
       });
       setShouldBlock(true);
-      const response = await fetch(`${url}/${params.row.id}`, {
+      const s = { ...params.row, updated_date_time: Date.now() };
+      s.source_id = sourceOptions[s.source];
+      s.category_id = categoryOptions[s.category];
+      const response = await fetch(`${url}slogans/${params.row.id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...params.row, updated_date_time: Date.now() }),
+
+        body: JSON.stringify(s),
       });
       if (!response.ok) {
         setError({ message: response.text });
@@ -202,7 +208,7 @@ export default function Table() {
         audience: "https://tresosos.com/slogans",
       });
       setShouldBlock(true);
-      const response = await fetch(`${url}/${id}`, {
+      const response = await fetch(`${url}/slogans/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -248,7 +254,7 @@ export default function Table() {
       field: "category",
       headerName: "Category",
       type: "singleSelect",
-      valueOptions: [...categoryOptions].sort(),
+      valueOptions: Object.keys(categoryOptions).sort(),
       flex: 2,
       editable: true,
       renderEditCell: (params) => {
@@ -259,7 +265,7 @@ export default function Table() {
       field: "source",
       headerName: "Source",
       type: "singleSelect",
-      valueOptions: [...sourceOptions].sort(),
+      valueOptions: Object.keys(sourceOptions).sort(),
       flex: 2,
       editable: true,
       renderEditCell: (params) => {
