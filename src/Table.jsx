@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
-import { LinearProgress } from "@mui/material";
+import { Badge, LinearProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -12,6 +12,9 @@ import {
   DataGrid,
   GridToolbarContainer,
   GridActionsCellItem,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
+  GridToolbarDensitySelector,
   GridToolbar,
 } from "@mui/x-data-grid";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -22,7 +25,7 @@ import AutocompleteCell from "./AutocompleteCell";
 const url = import.meta.env.VITE_SLOGAN_URL;
 
 function EditToolbar(props) {
-  const { setRows, setRowModesModel, setShouldBlock } = props;
+  const { setRows, rowLength, setRowModesModel, setShouldBlock } = props;
   const { getAccessTokenSilently } = useAuth0();
   const handleClick = async () => {
     try {
@@ -65,7 +68,12 @@ function EditToolbar(props) {
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
         Add Slogan
       </Button>
-      <GridToolbar></GridToolbar>
+      <GridToolbarColumnsButton />
+      <GridToolbarFilterButton />
+      <GridToolbarDensitySelector />
+      <Button>
+        <Badge max={1e6} color="primary" badgeContent={rowLength}></Badge>
+      </Button>
     </GridToolbarContainer>
   );
 }
@@ -337,6 +345,7 @@ export default function Table() {
     },
   ];
 
+  var rowLength = rows.length;
   return (
     <div>
       <DataGrid
@@ -360,7 +369,7 @@ export default function Table() {
           loadingOverlay: LinearProgress,
         }}
         slotProps={{
-          toolbar: { setRows, setRowModesModel, setShouldBlock },
+          toolbar: { setRows, rowLength, setRowModesModel, setShouldBlock },
           AutocompleteCell: { categoryOptions },
         }}
         loading={loading && isAuthenticated}
