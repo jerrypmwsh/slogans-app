@@ -15,19 +15,31 @@ import {
   GridToolbarColumnsButton,
   GridToolbarFilterButton,
   GridToolbarDensitySelector,
-  GridToolbar,
 } from "@mui/x-data-grid";
 import { useAuth0 } from "@auth0/auth0-react";
 import ErrorToast from "./ErrorToast";
 import LoadingBackdrop from "./LoadingBackdrop";
 import AutocompleteCell from "./AutocompleteCell";
+import AddCategoryDialog from "./AddCategoryDialog";
+import AddSourceDialog from "./AddSourceDialog";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
 function EditToolbar(props) {
-  const { setRows, rowLength, setRowModesModel, setShouldBlock } = props;
+  const {
+    setRows,
+    setCategoryOptions,
+    setSourceOptions,
+    rowLength,
+    setRowModesModel,
+    setShouldBlock,
+  } = props;
   const { getAccessTokenSilently } = useAuth0();
-  const handleClick = async () => {
+
+  const [openAddCategory, toggleAddCategory] = React.useState(false);
+  const [openAddSource, toggleAddSource] = React.useState(false);
+
+  const handleSloganClick = async () => {
     try {
       const token = await getAccessTokenSilently({
         audience: "https://tresosos.com/slogans",
@@ -63,18 +75,107 @@ function EditToolbar(props) {
     }
   };
 
+  const saveCategory = async (category) => {
+    try {
+      const token = await getAccessTokenSilently({
+        audience: "https://tresosos.com/slogans",
+      });
+      setShouldBlock(true);
+      const response = await fetch(`${url}/categories`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(category),
+      });
+      const json = await response.json();
+      setCategoryOptions((previousOptions) => {
+        return { category: json.id, ...previousOptions };
+      });
+    } catch (error) {
+      console.error(error);
+      setError(error);
+    } finally {
+      setShouldBlock(false);
+    }
+  };
+
+  const saveSource = async (source) => {
+    try {
+      const token = await getAccessTokenSilently({
+        audience: "https://tresosos.com/slogans",
+      });
+      setShouldBlock(true);
+      const response = await fetch(`${url}/sources`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(source),
+      });
+      const json = await response.json();
+      setSourceOptions((previousOptions) => {
+        return { source: json.id, ...previousOptions };
+      });
+    } catch (error) {
+      console.error(error);
+      setError(error);
+    } finally {
+      setShouldBlock(false);
+    }
+  };
+
+  const handleCategoryClick = async () => {
+    toggleAddCategory(true);
+  };
+  const handleSourceClick = async () => {
+    toggleAddSource(true);
+  };
+
   return (
-    <GridToolbarContainer>
-      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add Slogan
-      </Button>
-      <GridToolbarColumnsButton />
-      <GridToolbarFilterButton />
-      <GridToolbarDensitySelector />
-      <Button>
-        <Badge max={1e6} color="primary" badgeContent={rowLength}></Badge>
-      </Button>
-    </GridToolbarContainer>
+    <React.Fragment>
+      <GridToolbarContainer>
+        <Button
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleSloganClick}
+        >
+          Add Slogan
+        </Button>
+        <Button
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleCategoryClick}
+        >
+          Add Category
+        </Button>
+        <Button
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleSourceClick}
+        >
+          Add Source
+        </Button>
+        <GridToolbarColumnsButton />
+        <GridToolbarFilterButton />
+        <GridToolbarDensitySelector />
+        <Button>
+          <Badge max={1e6} color="primary" badgeContent={rowLength}></Badge>
+        </Button>
+      </GridToolbarContainer>
+      <AddCategoryDialog
+        open={openAddCategory}
+        setOpen={toggleAddCategory}
+        save={saveCategory}
+      />
+      <AddSourceDialog
+        open={openAddSource}
+        setOpen={toggleAddSource}
+        save={saveSource}
+      />
+    </React.Fragment>
   );
 }
 
@@ -369,7 +470,14 @@ export default function Table() {
           loadingOverlay: LinearProgress,
         }}
         slotProps={{
-          toolbar: { setRows, rowLength, setRowModesModel, setShouldBlock },
+          toolbar: {
+            setRows,
+            setCategoryOptions,
+            setSourceOptions,
+            rowLength,
+            setRowModesModel,
+            setShouldBlock,
+          },
           AutocompleteCell: { categoryOptions },
         }}
         loading={loading && isAuthenticated}
