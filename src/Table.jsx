@@ -1,7 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
-import { Badge, LinearProgress } from "@mui/material";
+import { Badge, LinearProgress, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -275,8 +275,6 @@ export default function Table() {
       });
       setShouldBlock(true);
       const s = { ...params.row, updated_date_time: Date.now() };
-      console.log("saving slogan...");
-      console.log(s);
       s.source_id = sourceOptions.find(
         (element) => element.source === s.source
       ).id;
@@ -359,8 +357,14 @@ export default function Table() {
       field: "category",
       headerName: "Category",
       valueOptions: categoryOptions,
+      type: "singleSelect",
       flex: 2,
       editable: true,
+      renderCell: (params) => {
+        return <Typography>{params.value}</Typography>;
+      },
+      getOptionLabel: (cat) => cat.category,
+      getOptionValue: (cat) => cat.category,
       renderEditCell: (params) => {
         return (
           <AutocompleteCell
@@ -374,8 +378,14 @@ export default function Table() {
       field: "source",
       headerName: "Source",
       valueOptions: sourceOptions,
+      type: "singleSelect",
       flex: 2,
       editable: true,
+      getOptionLabel: (src) => src.source,
+      getOptionValue: (src) => src.source,
+      renderCell: (params) => {
+        return <Typography>{params.value}</Typography>;
+      },
       renderEditCell: (params) => {
         return (
           <AutocompleteCell {...params} getOptionLabel={(src) => src.source} />
