@@ -4,7 +4,7 @@ import { useGridApiContext } from "@mui/x-data-grid";
 import { unstable_useEnhancedEffect as useEnhancedEffect } from "@mui/utils";
 
 export default function AutocompleteCell(props) {
-  const { id, value, field, colDef, hasFocus } = props;
+  const { id, value, field, colDef, hasFocus, getOptionLabel } = props;
   const apiRef = useGridApiContext();
 
   const inputRef = useRef();
@@ -14,9 +14,13 @@ export default function AutocompleteCell(props) {
     }
   }, [hasFocus]);
 
+  const val = colDef.valueOptions.find(
+    (element) => getOptionLabel(element) === value
+  );
+
   return (
     <Autocomplete
-      value={value}
+      value={val}
       options={colDef.valueOptions}
       renderInput={(params) => (
         <TextField
@@ -32,6 +36,19 @@ export default function AutocompleteCell(props) {
           field,
           value: event.target.innerText,
         });
+      }}
+      getOptionLabel={(option) => {
+        if (typeof option === "string") {
+          return option;
+        }
+        return getOptionLabel(option);
+      }}
+      isOptionEqualToValue={(option, value) => {
+        if (typeof value === "string") {
+          return value === getOptionLabel(option);
+        } else {
+          return getOptionLabel(option) === getOptionLabel(value);
+        }
       }}
       fullWidth
       disableClearable

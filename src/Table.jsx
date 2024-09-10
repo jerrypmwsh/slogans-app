@@ -35,10 +35,8 @@ function EditToolbar(props) {
     setShouldBlock,
   } = props;
   const { getAccessTokenSilently } = useAuth0();
-
   const [openAddCategory, toggleAddCategory] = React.useState(false);
   const [openAddSource, toggleAddSource] = React.useState(false);
-
   const handleSloganClick = async () => {
     try {
       const token = await getAccessTokenSilently({
@@ -91,7 +89,7 @@ function EditToolbar(props) {
       });
       const json = await response.json();
       setCategoryOptions((previousOptions) => {
-        return { category: json.id, ...previousOptions };
+        return [json, ...previousOptions];
       });
     } catch (error) {
       console.error(error);
@@ -117,7 +115,7 @@ function EditToolbar(props) {
       });
       const json = await response.json();
       setSourceOptions((previousOptions) => {
-        return { source: json.id, ...previousOptions };
+        return [json, ...previousOptions];
       });
     } catch (error) {
       console.error(error);
@@ -231,11 +229,7 @@ export default function Table() {
         });
 
         const json = await response.json();
-        const object = json.reduce(
-          (obj, item) => ((obj[item.category] = item.id), obj),
-          {}
-        );
-        setCategoryOptions(object);
+        setCategoryOptions(json);
       } catch (error) {
         console.error(error);
         setError(error);
@@ -257,11 +251,7 @@ export default function Table() {
         });
 
         const json = await response.json();
-        const object = json.reduce(
-          (obj, item) => ((obj[item.source] = item.id), obj),
-          {}
-        );
-        setSourceOptions(object);
+        setSourceOptions(json);
       } catch (error) {
         console.error(error);
         setError(error);
@@ -285,8 +275,14 @@ export default function Table() {
       });
       setShouldBlock(true);
       const s = { ...params.row, updated_date_time: Date.now() };
-      s.source_id = sourceOptions[s.source];
-      s.category_id = categoryOptions[s.category];
+      console.log("saving slogan...");
+      console.log(s);
+      s.source_id = sourceOptions.find(
+        (element) => element.source === s.source
+      ).id;
+      s.category_id = categoryOptions.find(
+        (element) => element.category === s.category
+      ).id;
       const response = await fetch(`${url}slogans/${params.row.id}`, {
         method: "PUT",
         headers: {
@@ -362,23 +358,28 @@ export default function Table() {
     {
       field: "category",
       headerName: "Category",
-      type: "singleSelect",
-      valueOptions: Object.keys(categoryOptions).sort(),
+      valueOptions: categoryOptions,
       flex: 2,
       editable: true,
       renderEditCell: (params) => {
-        return <AutocompleteCell {...params} />;
+        return (
+          <AutocompleteCell
+            {...params}
+            getOptionLabel={(cat) => cat.category}
+          />
+        );
       },
     },
     {
       field: "source",
       headerName: "Source",
-      type: "singleSelect",
-      valueOptions: Object.keys(sourceOptions).sort(),
+      valueOptions: sourceOptions,
       flex: 2,
       editable: true,
       renderEditCell: (params) => {
-        return <AutocompleteCell {...params} />;
+        return (
+          <AutocompleteCell {...params} getOptionLabel={(src) => src.source} />
+        );
       },
     },
     {
