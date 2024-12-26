@@ -9,6 +9,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import LoginPage from "./LoginPage";
 import Dashboard from "./Dashboard";
 import NavBar from "./NavBar";
+import Slogans from "./slogans/Slogans";
 
 const Layout = () => (
   <div>
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "/slogans-app/dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "/slogans-app/new",
+        element: <Slogans />,
       },
     ],
   },
