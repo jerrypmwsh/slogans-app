@@ -2,11 +2,17 @@ import React, { useState } from "react";
 import { Container, TextField, Typography } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
 import { DataGrid } from "@mui/x-data-grid";
+import { Link, Navigate } from "react-router-dom";
 
+// TODO: contextualize
 const url = import.meta.env.VITE_SLOGAN_URL;
 
 export default function Slogans() {
-  const { getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  if (!isAuthenticated) {
+    return <Navigate to="/slogans-app/" />;
+  }
+
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
 
@@ -31,7 +37,16 @@ export default function Slogans() {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", type: "number", flex: 2, editable: false },
+    {
+      field: "id",
+      headerName: "ID",
+      type: "number",
+      flex: 2,
+      editable: false,
+      renderCell: (params) => {
+        return <Link to={`${params.row.id}`}>{params.row.id}</Link>;
+      },
+    },
     { field: "slogan", headerName: "Slogan", flex: 3, editable: false },
     { field: "company", headerName: "Company", flex: 2, editable: false },
     { field: "category", headerName: "Category", flex: 2, editable: false },

@@ -10,6 +10,7 @@ import LoginPage from "./LoginPage";
 import Dashboard from "./Dashboard";
 import NavBar from "./NavBar";
 import Slogans from "./slogans/Slogans";
+import SloganDetail from "./slogans/SloganDetail";
 
 const Layout = () => (
   <div>
@@ -28,17 +29,21 @@ const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
-      {
-        path: "/slogans-app/slogans",
-        element: <App />,
-      },
+      // {
+      //   path: "/slogans-app/slogans",
+      //   element: <App />,
+      // },
       {
         path: "/slogans-app/dashboard",
         element: <Dashboard />,
       },
       {
-        path: "/slogans-app/new",
+        path: "/slogans-app/slogans",
         element: <Slogans />,
+      },
+      {
+        path: "/slogans-app/slogans/:id",
+        element: <SloganDetail />,
       },
     ],
   },
