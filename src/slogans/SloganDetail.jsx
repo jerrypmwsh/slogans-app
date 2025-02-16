@@ -1,11 +1,14 @@
 // v2 of editing and visualizing experience
 import { useEffect, useState } from "react";
-import { TextField, Autocomplete, Button, Box } from "@mui/material";
-import dayjs from "dayjs";
-import { DateTimePicker } from "@mui/x-date-pickers";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import ErrorToast from "../ErrorToast";
+import {
+  TextField,
+  Autocomplete,
+  Button,
+  Box,
+  Container,
+  Paper,
+} from "@mui/material";
+import { SnackbarProvider, enqueueSnackbar } from "notistack";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useParams } from "react-router-dom";
 
@@ -15,7 +18,6 @@ export default function SloganDetail() {
   const { id } = useParams();
   const { getAccessTokenSilently } = useAuth0();
   const [slogan, setSlogan] = useState();
-  const [error, setError] = useState({});
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [sourceOptions, setSourceOptions] = useState([]);
 
@@ -60,7 +62,9 @@ export default function SloganDetail() {
         });
       } catch (e) {
         console.error(e);
-        setError(e);
+        enqueueSnackbar("Failed to save. Error: " + error, {
+          variant: "error",
+        });
       }
     };
 
@@ -77,7 +81,6 @@ export default function SloganDetail() {
     };
     delete requestPayload.category;
     delete requestPayload.source;
-    console.log(requestPayload);
 
     try {
       const token = await getAccessTokenSilently({
@@ -94,87 +97,125 @@ export default function SloganDetail() {
         body: JSON.stringify(requestPayload),
       });
       if (!response.ok) {
-        setError({ message: response.text });
+        console.log(response);
+        enqueueSnackbar("Failed to save. Error: " + response.text, {
+          variant: "error",
+        });
+      } else {
+        enqueueSnackbar("Slogan Saved", {
+          variant: "success",
+          autoHideDuration: 2000,
+        });
       }
     } catch (error) {
       console.error(error);
-      setError(error);
+      enqueueSnackbar("Failed to save. Error: " + error, {
+        variant: "error",
+      });
     }
   };
 
   if (slogan === undefined) {
     return <div>Loading...</div>;
   }
-  return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit}
-      sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: 400 }}
-    >
-      <TextField
-        label="Slogan"
-        variant="outlined"
-        fullWidth
-        value={slogan.slogan}
-        onChange={(e) =>
-          setSlogan((prev) => ({ ...prev, slogan: e.target.value }))
-        }
-      />
-      <Autocomplete
-        options={categoryOptions}
-        getOptionLabel={(option) =>
-          typeof option === "string" ? option : option.category
-        }
-        isOptionEqualToValue={(option, value) =>
-          option.category === value.category
-        }
-        value={slogan.category}
-        onChange={(e, newValue) => {
-          setSlogan((prev) => ({ ...prev, category: newValue }));
-        }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Autocomplete"
-            variant="outlined"
-            fullWidth
-          />
-        )}
-      />
-      <Autocomplete
-        options={sourceOptions}
-        getOptionLabel={(option) =>
-          typeof option === "string" ? option : option.source
-        }
-        isOptionEqualToValue={(option, value) => option.source === value.source}
-        value={slogan.source}
-        onChange={(e, newValue) => {
-          setSlogan((prev) => ({ ...prev, source: newValue }));
-        }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Autocomplete"
-            variant="outlined"
-            fullWidth
-          />
-        )}
-      />
-      <TextField
-        label="source info"
-        variant="outlined"
-        fullWidth
-        value={slogan.source_info}
-        onChange={(e) =>
-          setSlogan((prev) => ({ ...prev, source_info: e.target.value }))
-        }
-      />
 
-      <Button type="submit" variant="contained" color="primary">
-        Submit
-      </Button>
-      <ErrorToast error={error} setError={setError} />
-      <ErrorToast error={error} setError={setError} />
-    </Box>
+  const formComponents = [
+    <TextField
+      label="Slogan"
+      variant="outlined"
+      fullWidth
+      value={slogan.slogan}
+      onChange={(e) =>
+        setSlogan((prev) => ({ ...prev, slogan: e.target.value }))
+      }
+    />,
+    <Autocomplete
+      options={categoryOptions}
+      getOptionLabel={(option) =>
+        typeof option === "string" ? option : option.category
+      }
+      isOptionEqualToValue={(option, value) =>
+        option.category === value.category
+      }
+      value={slogan.category}
+      onChange={(e, newValue) => {
+        setSlogan((prev) => ({ ...prev, category: newValue }));
+      }}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Autocomplete"
+          variant="outlined"
+          fullWidth
+        />
+      )}
+    />,
+    <Autocomplete
+      options={sourceOptions}
+      getOptionLabel={(option) =>
+        typeof option === "string" ? option : option.source
+      }
+      isOptionEqualToValue={(option, value) => option.source === value.source}
+      value={slogan.source}
+      onChange={(e, newValue) => {
+        setSlogan((prev) => ({ ...prev, source: newValue }));
+      }}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Autocomplete"
+          variant="outlined"
+          fullWidth
+        />
+      )}
+    />,
+    <TextField
+      label="source info"
+      variant="outlined"
+      fullWidth
+      value={slogan.source_info}
+      onChange={(e) =>
+        setSlogan((prev) => ({ ...prev, source_info: e.target.value }))
+      }
+    />,
+  ];
+
+  return (
+    <Container
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        minHeight: "100vh",
+      }}
+    >
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          flexDirection: "column",
+          alignContent: "center",
+          minHeight: "50vh",
+          gap: 2,
+          minWidth: "60vh",
+        }}
+      >
+        {formComponents.map((fc) => (
+          <Paper>{fc}</Paper>
+        ))}
+        <Button type="submit" variant="contained" color="primary">
+          Save
+        </Button>
+        ,
+      </Box>
+      <SnackbarProvider
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      />
+    </Container>
   );
 }

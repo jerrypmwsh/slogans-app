@@ -17,7 +17,17 @@ const Layout = () => (
     <header>
       <NavBar />
     </header>
-    <Outlet />
+    <Outlet
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "column",
+        alignContent: "center",
+        minHeight: "50vh",
+        gap: 2,
+        maxWidth: "50vh",
+      }}
+    />
   </div>
 );
 
