@@ -10,17 +10,17 @@ import {
 } from "@mui/material";
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
-export default function SloganDetail() {
+export default function SloganCreate() {
   const { id } = useParams();
   const { getAccessTokenSilently } = useAuth0();
-  const [slogan, setSlogan] = useState();
+  const [slogan, setSlogan] = useState({});
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [sourceOptions, setSourceOptions] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -28,38 +28,29 @@ export default function SloganDetail() {
           audience: "https://tresosos.com/slogans",
         });
 
-        const [slogansResponse, categoriesResponse, sourcesResponse] =
-          await Promise.all([
-            fetch(`${url}slogans/${id}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }),
-            fetch(`${url}categories`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }),
-            fetch(`${url}sources`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }),
-          ]);
+        const [categoriesResponse, sourcesResponse] = await Promise.all([
+          fetch(`${url}categories`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          fetch(`${url}sources`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+        ]);
 
         const categoriesJson = await categoriesResponse.json();
         setCategoryOptions(categoriesJson);
         const sourcesJson = await sourcesResponse.json();
         setSourceOptions(sourcesJson);
 
-        const sloganJson = await slogansResponse.json();
-        setSlogan({
-          ...sloganJson,
-          category: categoriesJson.find(
-            (c) => c.category === sloganJson.category
-          ),
-          source: sourcesJson.find((src) => src.source === sloganJson.source),
-        });
+        setSlogan((prev) => ({
+          ...prev,
+          category: categoriesJson[0],
+          source: sourcesJson[0],
+        }));
       } catch (e) {
         console.error(e);
         enqueueSnackbar("Failed to save. Error: " + error, {
@@ -87,8 +78,8 @@ export default function SloganDetail() {
         audience: "https://tresosos.com/slogans",
       });
 
-      const response = await fetch(`${url}slogans/${id}`, {
-        method: "PUT",
+      const response = await fetch(`${url}slogans`, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -102,10 +93,8 @@ export default function SloganDetail() {
           variant: "error",
         });
       } else {
-        enqueueSnackbar("Slogan Saved", {
-          variant: "success",
-          autoHideDuration: 2000,
-        });
+        const s = await response.json();
+        navigate(`/slogans-app/slogans/${s.id}`);
       }
     } catch (error) {
       console.error(error);
@@ -114,20 +103,22 @@ export default function SloganDetail() {
       });
     }
   };
-
-  if (slogan === undefined) {
+  if (categoryOptions.length === 0 || sourceOptions.length === 0) {
     return <div>Loading...</div>;
   }
 
   const formComponents = [
     <TextField
-      label="Slogan"
+      label="Enter a slogan"
       variant="outlined"
       fullWidth
       value={slogan.slogan}
       onChange={(e) =>
         setSlogan((prev) => ({ ...prev, slogan: e.target.value }))
       }
+      onFocus={(event) => {
+        event.target.select();
+      }}
     />,
     <TextField
       label="Company"
@@ -139,7 +130,6 @@ export default function SloganDetail() {
       }
     />,
     <Autocomplete
-      label="Category"
       options={categoryOptions}
       getOptionLabel={(option) =>
         typeof option === "string" ? option : option.category
@@ -147,12 +137,17 @@ export default function SloganDetail() {
       isOptionEqualToValue={(option, value) =>
         option.category === value.category
       }
-      value={slogan.category}
+      value={categoryOptions[0]}
       onChange={(e, newValue) => {
         setSlogan((prev) => ({ ...prev, category: newValue }));
       }}
       renderInput={(params) => (
-        <TextField {...params} label="Category" variant="outlined" fullWidth />
+        <TextField
+          {...params}
+          label="Enter a category"
+          variant="outlined"
+          fullWidth
+        />
       )}
     />,
     <Autocomplete
@@ -161,12 +156,17 @@ export default function SloganDetail() {
         typeof option === "string" ? option : option.source
       }
       isOptionEqualToValue={(option, value) => option.source === value.source}
-      value={slogan.source}
+      value={sourceOptions[0]}
       onChange={(e, newValue) => {
         setSlogan((prev) => ({ ...prev, source: newValue }));
       }}
       renderInput={(params) => (
-        <TextField {...params} label="Source" variant="outlined" fullWidth />
+        <TextField
+          {...params}
+          label="Enter a source"
+          variant="outlined"
+          fullWidth
+        />
       )}
     />,
     <TextField

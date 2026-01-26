@@ -11,6 +11,7 @@ import Dashboard from "./Dashboard";
 import NavBar from "./NavBar";
 import Slogans from "./slogans/Slogans";
 import SloganDetail from "./slogans/SloganDetail";
+import SloganCreate from "./slogans/SloganCreate";
 
 const Layout = () => (
   <div>
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: "/slogans-app/slogans",
         element: <Slogans />,
+      },
+      {
+        path: "/slogans-app/slogans/new",
+        element: <SloganCreate />,
       },
       {
         path: "/slogans-app/slogans/:id",
