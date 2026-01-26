@@ -6,7 +6,7 @@ import LoginButton from "./LoginButton";
 export default function LoginPage() {
   const { isAuthenticated } = useAuth0();
   if (isAuthenticated) {
-    return <Navigate to="/slogans-app/slogans" />;
+    return <Navigate to="/slogans" />;
   }
   return (
     <Paper elevation={10} square={false}>
@@ -20,7 +20,7 @@ export default function LoginPage() {
       >
         <Avatar
           variant="circular"
-          src={`${window.location.origin}/slogans-app/logo.png`}
+          src={`${window.location.origin}/logo.png`}
           style={{ width: "20%", height: "20%" }}
         />
         <LoginButton></LoginButton>

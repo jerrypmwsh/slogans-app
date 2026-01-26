@@ -33,7 +33,7 @@ const Layout = () => (
 
 const router = createBrowserRouter([
   {
-    path: "/slogans-app",
+    path: "/",
     element: <LoginPage></LoginPage>,
   },
   {
@@ -44,15 +44,15 @@ const router = createBrowserRouter([
       //   element: <App />,
       // },
       {
-        path: "/slogans-app/dashboard",
+        path: "/dashboard",
         element: <Dashboard />,
       },
       {
-        path: "/slogans-app/slogans",
+        path: "/slogans",
         element: <Slogans />,
       },
       {
-        path: "/slogans-app/slogans/:id",
+        path: "/slogans/:id",
         element: <SloganDetail />,
       },
     ],
@@ -66,12 +66,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       clientId="KvRHjbjqF7kjvpm3jnXixUcazvGbVO7k"
       authorizationParams={{
         audience: "https://tresosos.com/slogans",
-        redirect_uri: `${window.location.origin}/slogans-app/`,
+        redirect_uri: `${window.location.origin}/`,
       }}
     >
       <ThemeProvider theme={appTheme}>
         <RouterProvider router={router} />
       </ThemeProvider>
     </Auth0Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -10,7 +10,7 @@ const url = import.meta.env.VITE_SLOGAN_URL;
 export default function Slogans() {
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
   if (!isAuthenticated) {
-    return <Navigate to="/slogans-app/" />;
+    return <Navigate to="/" />;
   }
 
   const [query, setQuery] = useState("");
