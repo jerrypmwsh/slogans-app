@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Container,
@@ -24,12 +24,15 @@ const url = import.meta.env.VITE_SLOGAN_URL;
 export default function Slogans() {
   const navigate = useNavigate();
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
-  if (!isAuthenticated) {
-    navigate("/slogans-app/");
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/slogans-app/");
+    }
+  }, [isAuthenticated]);
 
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = useState({});
 
   const handleDeleteClick = (id) => async () => {
@@ -43,7 +46,6 @@ export default function Slogans() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response);
       if (response.status != 200) {
         setError({ message: "Failed to delete" });
       }
@@ -56,6 +58,7 @@ export default function Slogans() {
 
   const handleSearch = async (event) => {
     if (event.key === "Enter") {
+      setLoading(true);
       try {
         const token = await getAccessTokenSilently({
           audience: "https://tresosos.com/slogans",
@@ -70,6 +73,8 @@ export default function Slogans() {
         setData(json);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -150,7 +155,7 @@ export default function Slogans() {
         <Typography variant="h6" style={{ marginBottom: "10px" }}>
           {data.length} result(s) found
         </Typography>
-        {data.length > 0 && (
+        {
           <DataGrid
             initialState={{
               ...data.initialState,
@@ -164,8 +169,9 @@ export default function Slogans() {
               console.log(params);
               console.log(details);
             }}
+            loading={loading}
           ></DataGrid>
-        )}
+        }
       </Container>
       <ErrorToast error={error} setError={setError} />
     </div>
