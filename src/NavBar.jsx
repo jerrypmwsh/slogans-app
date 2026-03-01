@@ -10,9 +10,11 @@ export default function NavBar() {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Slogans
-        </Typography>
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{ flexGrow: 1 }}
+        ></Typography>
         <Box>
           <Button color="inherit">
             <MLink component={Link} to="/slogans-app/slogans" color="inherit">

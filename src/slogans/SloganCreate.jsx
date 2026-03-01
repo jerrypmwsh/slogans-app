@@ -182,11 +182,12 @@ export default function SloganCreate() {
 
   return (
     <Container
-      style={{
+      sx={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        minHeight: "100vh",
+        justifyContent: "center",
+        flexGrow: 1,
       }}
     >
       <Box

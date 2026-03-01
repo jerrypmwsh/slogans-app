@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
-import {
-  DataGrid,
-  GridToolbarColumnsButton,
-  GridToolbarContainer,
-  GridToolbarDensitySelector,
-  GridToolbarFilterButton,
-} from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+
+import ErrorToast from "../ErrorToast";
 
 // TODO: contextualize
 const url = import.meta.env.VITE_SLOGAN_URL;
@@ -23,6 +20,29 @@ export default function Slogans() {
 
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
+  const [error, setError] = useState({});
+
+  const handleDeleteClick = (id) => async () => {
+    try {
+      const token = await getAccessTokenSilently({
+        audience: "https://tresosos.com/slogans",
+      });
+      const response = await fetch(`${url}/slogans/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response);
+      if (response.status != 200) {
+        setError({ message: "Failed to delete" });
+      }
+    } catch (error) {
+      console.error(error);
+      setError(error);
+    }
+    setData(data.filter((row) => row.id !== id));
+  };
 
   const handleSearch = async (event) => {
     if (event.key === "Enter") {
@@ -61,6 +81,23 @@ export default function Slogans() {
       headerName: "Last Updated",
       type: "number",
       editable: false,
+    },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      flex: 1,
+      cellClassName: "actions",
+      getActions: ({ id }) => {
+        return [
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={handleDeleteClick(id)}
+            color="inherit"
+          />,
+        ];
+      },
     },
   ];
 
@@ -111,6 +148,7 @@ export default function Slogans() {
           }}
         ></DataGrid>
       )}
+      <ErrorToast error={error} setError={setError} />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { ThemeProvider } from "@mui/material";
+import { ThemeProvider, Box } from "@mui/material";
 import { appTheme } from "./Theme";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
@@ -14,22 +14,17 @@ import SloganDetail from "./slogans/SloganDetail";
 import SloganCreate from "./slogans/SloganCreate";
 
 const Layout = () => (
-  <div>
+  <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
     <header>
       <NavBar />
     </header>
-    <Outlet
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        flexDirection: "column",
-        alignContent: "center",
-        minHeight: "50vh",
-        gap: 2,
-        maxWidth: "50vh",
-      }}
-    />
-  </div>
+    <Box
+      component="main"
+      sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+    >
+      <Outlet />
+    </Box>
+  </Box>
 );
 
 const router = createBrowserRouter([
@@ -78,5 +73,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <RouterProvider router={router} />
       </ThemeProvider>
     </Auth0Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

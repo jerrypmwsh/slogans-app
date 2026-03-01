@@ -56,7 +56,7 @@ export default function SloganDetail() {
         setSlogan({
           ...sloganJson,
           category: categoriesJson.find(
-            (c) => c.category === sloganJson.category
+            (c) => c.category === sloganJson.category,
           ),
           source: sourcesJson.find((src) => src.source === sloganJson.source),
         });
@@ -182,11 +182,12 @@ export default function SloganDetail() {
 
   return (
     <Container
-      style={{
+      sx={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        minHeight: "100vh",
+        justifyContent: "center",
+        flexGrow: 1,
       }}
     >
       <Box
