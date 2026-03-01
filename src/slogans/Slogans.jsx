@@ -1,9 +1,19 @@
 import React, { useState } from "react";
-import { Button, Container, Stack, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Container,
+  Stack,
+  TextField,
+  Typography,
+  InputAdornment,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import ErrorToast from "../ErrorToast";
@@ -108,46 +118,55 @@ export default function Slogans() {
           marginTop: "50px",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
         }}
       >
-        <Stack direction="row" spacing={2}>
-          <Button
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={() => navigate("/slogans-app/slogans/new")}
-          >
-            Add Slogan
-          </Button>
+        <Stack direction="row" spacing={2} sx={{ width: "100%", mb: 3 }}>
           <TextField
-            label="Search"
+            label="Search Slogans"
             variant="outlined"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleSearch}
-            style={{ width: "100%", marginBottom: "20px" }}
+            sx={{ flexGrow: 1 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => handleSearch({ key: "Enter" })}>
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
+          <Tooltip title="Add a slogan">
+            <IconButton
+              color="primary"
+              onClick={() => navigate("/slogans-app/slogans/new")}
+            >
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
         </Stack>
         <Typography variant="h6" style={{ marginBottom: "10px" }}>
           {data.length} result(s) found
         </Typography>
+        {data.length > 0 && (
+          <DataGrid
+            initialState={{
+              ...data.initialState,
+              pagination: { paginationModel: { pageSize: 10 } },
+            }}
+            pageSizeOptions={[5, 10, 25, 100]}
+            rows={data}
+            columns={columns}
+            onRowClick={(params, event, details) => {
+              navigate("/slogans-app/slogans/" + params.row.id);
+              console.log(params);
+              console.log(details);
+            }}
+          ></DataGrid>
+        )}
       </Container>
-      {data.length > 0 && (
-        <DataGrid
-          initialState={{
-            ...data.initialState,
-            pagination: { paginationModel: { pageSize: 10 } },
-          }}
-          pageSizeOptions={[5, 10, 25, 100]}
-          rows={data}
-          columns={columns}
-          onRowClick={(params, event, details) => {
-            navigate("/slogans-app/slogans/" + params.row.id);
-            console.log(params);
-            console.log(details);
-          }}
-        ></DataGrid>
-      )}
       <ErrorToast error={error} setError={setError} />
     </div>
   );
