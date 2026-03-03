@@ -22,6 +22,15 @@ export default function NavBar() {
             </MLink>
           </Button>
           <Button color="inherit">
+            <MLink
+              component={Link}
+              to="/slogans-app/categories"
+              color="inherit"
+            >
+              categories
+            </MLink>
+          </Button>
+          <Button color="inherit">
             <MLink component={Link} to="/slogans-app/dashboard" color="inherit">
               dashboard
             </MLink>
