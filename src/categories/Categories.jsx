@@ -9,6 +9,7 @@ import {
 import { useAuth0 } from "@auth0/auth0-react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 
 import ErrorToast from "../ErrorToast";
@@ -109,9 +110,22 @@ export default function Categories() {
           flexDirection: "column",
         }}
       >
-        <Typography variant="h4" style={{ marginBottom: "20px" }}>
-          Categories
-        </Typography>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          style={{ marginBottom: "20px" }}
+        >
+          <Typography variant="h4">Categories</Typography>
+          <Tooltip title="Add a category">
+            <IconButton
+              color="primary"
+              onClick={() => navigate("/slogans-app/categories/new")}
+            >
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+        </Stack>
         <div style={{ height: 600, width: "100%" }}>
           <DataGrid
             rows={data}

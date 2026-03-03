@@ -14,6 +14,7 @@ import SloganDetail from "./slogans/SloganDetail";
 import SloganCreate from "./slogans/SloganCreate";
 import Categories from "./categories/Categories";
 import CategoryDetail from "./categories/CategoryDetail";
+import CategoryCreate from "./categories/CategoryCreate";
 
 const Layout = () => (
   <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: "/slogans-app/categories",
         element: <Categories />,
+      },
+      {
+        path: "/slogans-app/categories/new",
+        element: <CategoryCreate />,
       },
       {
         path: "/slogans-app/categories/:id",
