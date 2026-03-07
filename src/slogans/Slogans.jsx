@@ -56,26 +56,36 @@ export default function Slogans() {
     setData(data.filter((row) => row.id !== id));
   };
 
+  const fetchSlogans = async () => {
+    setLoading(true);
+    try {
+      const token = await getAccessTokenSilently({
+        audience: "https://tresosos.com/slogans",
+      });
+      // TODO: probably some string sanitization
+      const response = await fetch(`${url}slogans?search=${query}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const json = await response.json();
+      setData(json);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchSlogans();
+    }
+  }, [isAuthenticated]);
+
   const handleSearch = async (event) => {
     if (event.key === "Enter") {
-      setLoading(true);
-      try {
-        const token = await getAccessTokenSilently({
-          audience: "https://tresosos.com/slogans",
-        });
-        // TODO: probably some string sanitization
-        const response = await fetch(`${url}slogans?search=${query}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const json = await response.json();
-        setData(json);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
+      fetchSlogans();
     }
   };
 
