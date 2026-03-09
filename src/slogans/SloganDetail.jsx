@@ -1,5 +1,5 @@
 // v2 of editing and visualizing experience
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   TextField,
   Autocomplete,
@@ -8,18 +8,29 @@ import {
   Container,
   Paper,
 } from "@mui/material";
-import { SnackbarProvider, enqueueSnackbar } from "notistack";
+import { useSnackbar } from "notistack";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
 export default function SloganDetail() {
   const { id } = useParams();
+  const location = useLocation();
+  const { enqueueSnackbar } = useSnackbar();
   const { getAccessTokenSilently } = useAuth0();
   const [slogan, setSlogan] = useState();
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [sourceOptions, setSourceOptions] = useState([]);
+  const processed = useRef(false);
+
+  useEffect(() => {
+    if (location.state?.snackbar && !processed.current) {
+      enqueueSnackbar(location.state.snackbar, { variant: "success" });
+      processed.current = true;
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -211,12 +222,6 @@ export default function SloganDetail() {
         </Button>
         ,
       </Box>
-      <SnackbarProvider
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      />
     </Container>
   );
 }

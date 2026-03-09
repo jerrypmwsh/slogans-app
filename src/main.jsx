@@ -18,6 +18,7 @@ import CategoryCreate from "./categories/CategoryCreate";
 import Sources from "./sources/Sources";
 import SourceDetail from "./sources/SourceDetail";
 import SourceCreate from "./sources/SourceCreate";
+import { SnackbarProvider } from "notistack";
 
 const Layout = () => (
   <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -100,7 +101,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       }}
     >
       <ThemeProvider theme={appTheme}>
-        <RouterProvider router={router} />
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <RouterProvider router={router} />
+        </SnackbarProvider>
       </ThemeProvider>
     </Auth0Provider>
   </React.StrictMode>,

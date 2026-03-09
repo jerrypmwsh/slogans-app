@@ -8,7 +8,7 @@ import {
   Container,
   Paper,
 } from "@mui/material";
-import { SnackbarProvider, enqueueSnackbar } from "notistack";
+import { useSnackbar } from "notistack";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -16,6 +16,7 @@ const url = import.meta.env.VITE_SLOGAN_URL;
 
 export default function SloganCreate() {
   const { id } = useParams();
+  const { enqueueSnackbar } = useSnackbar();
   const { getAccessTokenSilently } = useAuth0();
   const [slogan, setSlogan] = useState({});
   const [categoryOptions, setCategoryOptions] = useState([]);
@@ -94,7 +95,9 @@ export default function SloganCreate() {
         });
       } else {
         const s = await response.json();
-        navigate(`/slogans-app/slogans/${s.id}`);
+        navigate(`/slogans-app/slogans/${s.id}`, {
+          state: { snackbar: "Slogan created successfully!" },
+        });
       }
     } catch (error) {
       console.error(error);
@@ -211,12 +214,6 @@ export default function SloganCreate() {
         </Button>
         ,
       </Box>
-      <SnackbarProvider
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      />
     </Container>
   );
 }
