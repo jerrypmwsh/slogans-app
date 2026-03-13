@@ -13,6 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 
 import ErrorToast from "../ErrorToast";
+import AddCategoryDialog from "./AddCategoryDialog";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
@@ -22,6 +23,7 @@ export default function Categories() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -79,6 +81,10 @@ export default function Categories() {
     }
   };
 
+  const handleSaveCategory = (newCategory) => {
+    setData((prevData) => [newCategory, ...prevData]);
+  };
+
   const columns = [
     { field: "id", headerName: "ID", type: "number", flex: 1 },
     { field: "category", headerName: "Category", flex: 3 },
@@ -118,10 +124,7 @@ export default function Categories() {
         >
           <Typography variant="h4">Categories</Typography>
           <Tooltip title="Add a category">
-            <IconButton
-              color="primary"
-              onClick={() => navigate("/slogans-app/categories/new")}
-            >
+            <IconButton color="primary" onClick={() => setAddDialogOpen(true)}>
               <AddIcon />
             </IconButton>
           </Tooltip>
@@ -138,6 +141,11 @@ export default function Categories() {
         </div>
       </Container>
       <ErrorToast error={error} setError={setError} />
+      <AddCategoryDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onSave={handleSaveCategory}
+      />
     </div>
   );
 }

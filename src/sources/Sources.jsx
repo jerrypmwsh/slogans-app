@@ -13,6 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 
 import ErrorToast from "../ErrorToast";
+import AddSourceDialog from "./AddSourceDialog";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
@@ -22,6 +23,7 @@ export default function Sources() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -79,6 +81,10 @@ export default function Sources() {
     }
   };
 
+  const handleSaveSource = (newSource) => {
+    setData((prevData) => [newSource, ...prevData]);
+  };
+
   const columns = [
     { field: "id", headerName: "ID", type: "number", flex: 1 },
     { field: "source", headerName: "Source", flex: 3 },
@@ -110,15 +116,15 @@ export default function Sources() {
           flexDirection: "column",
         }}
       >
-        <Stack direction="row" justifyContent="space-between" alignItems="center" style={{ marginBottom: "20px" }}>
-          <Typography variant="h4">
-            Sources
-          </Typography>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          style={{ marginBottom: "20px" }}
+        >
+          <Typography variant="h4">Sources</Typography>
           <Tooltip title="Add a source">
-            <IconButton
-              color="primary"
-              onClick={() => navigate("/slogans-app/sources/new")}
-            >
+            <IconButton color="primary" onClick={() => setAddDialogOpen(true)}>
               <AddIcon />
             </IconButton>
           </Tooltip>
@@ -135,6 +141,11 @@ export default function Sources() {
         </div>
       </Container>
       <ErrorToast error={error} setError={setError} />
+      <AddSourceDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onSave={handleSaveSource}
+      />
     </div>
   );
 }

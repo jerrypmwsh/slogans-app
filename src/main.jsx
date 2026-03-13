@@ -11,7 +11,6 @@ import Dashboard from "./Dashboard";
 import NavBar from "./NavBar";
 import Slogans from "./slogans/Slogans";
 import SloganDetail from "./slogans/SloganDetail";
-import SloganCreate from "./slogans/SloganCreate";
 import Categories from "./categories/Categories";
 import CategoryDetail from "./categories/CategoryDetail";
 import CategoryCreate from "./categories/CategoryCreate";
@@ -53,10 +52,6 @@ const router = createBrowserRouter([
       {
         path: "/slogans-app/slogans",
         element: <Slogans />,
-      },
-      {
-        path: "/slogans-app/slogans/new",
-        element: <SloganCreate />,
       },
       {
         path: "/slogans-app/slogans/:id",
