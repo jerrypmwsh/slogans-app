@@ -7,10 +7,11 @@ import {
   Button,
   Box,
   Stack,
+  Paper,
 } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
 import LoadingBackdrop from "../LoadingBackdrop";
-import { SnackbarProvider, enqueueSnackbar } from "notistack";
+import { useSnackbar } from "notistack";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
@@ -18,6 +19,7 @@ export default function CategoryDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [category, setCategory] = useState({ category: "", id: -1 });
   const [loading, setLoading] = useState(false);
@@ -56,7 +58,7 @@ export default function CategoryDetail() {
     };
 
     fetchCategory();
-  }, [id, isAuthenticated, getAccessTokenSilently, navigate]);
+  }, [id, isAuthenticated, getAccessTokenSilently, navigate, enqueueSnackbar]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -85,6 +87,7 @@ export default function CategoryDetail() {
       }
 
       enqueueSnackbar("Category saved successfully", { variant: "success" });
+      navigate("/slogans-app/categories");
     } catch (error) {
       console.error("Error updating category:", error);
       enqueueSnackbar("Error updating category: " + error.message, {
@@ -100,50 +103,53 @@ export default function CategoryDetail() {
   };
 
   return (
-    <Container style={{ marginTop: "50px" }}>
-      <Typography variant="h4" gutterBottom>
-        Edit Category
-      </Typography>
+    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom align="center">
+          Edit Category
+        </Typography>
 
-      {loading ? (
-        <Typography>Loading...</Typography>
-      ) : (
-        <Box component="form" noValidate autoComplete="off">
-          <Stack spacing={3}>
-            <TextField label="ID" value={category.id} disabled fullWidth />
-            <TextField
-              label="Category Name"
-              value={category.category || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-            />
-
-            <Stack direction="row" spacing={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSave}
-                disabled={saving}
-              >
-                Save
-              </Button>
-              <Button
+        {!loading && (
+          <Box component="form" noValidate autoComplete="off">
+            <Stack spacing={3}>
+              <TextField
+                label="ID"
+                value={category.id}
+                disabled
+                fullWidth
                 variant="outlined"
-                onClick={() => navigate("/slogans-app/categories")}
-                disabled={saving}
-              >
-                Back
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-      )}
+              />
+              <TextField
+                label="Category Name"
+                value={category.category || ""}
+                onChange={handleChange}
+                fullWidth
+                required
+                variant="outlined"
+              />
 
+              <Stack direction="row" spacing={2} justifyContent="flex-end">
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate("/slogans-app/categories")}
+                  disabled={saving}
+                >
+                  Back
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  Save
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
+        )}
+      </Paper>
       <LoadingBackdrop open={saving || loading} />
-      <SnackbarProvider
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      />
     </Container>
   );
 }
