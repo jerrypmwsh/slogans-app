@@ -35,7 +35,7 @@ export default function Dashboard() {
   const [categories, setCategories] = React.useState([]);
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
   if (!isAuthenticated) {
-    return <Navigate to="/slogans-app" />;
+    return <Navigate to="/" />;
   }
   React.useEffect(() => {
     const fetchData = async () => {

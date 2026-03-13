@@ -43,7 +43,7 @@ const Profile = () => {
           onClick={() =>
             logout({
               logoutParams: {
-                returnTo: `${window.location.origin}/slogans-app/`,
+                returnTo: `${window.location.origin}/`,
               },
             })
           }

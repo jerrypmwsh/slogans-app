@@ -17,26 +17,22 @@ export default function NavBar() {
         ></Typography>
         <Box>
           <Button color="inherit">
-            <MLink component={Link} to="/slogans-app/slogans" color="inherit">
+            <MLink component={Link} to="/slogans" color="inherit">
               slogans
             </MLink>
           </Button>
           <Button color="inherit">
-            <MLink
-              component={Link}
-              to="/slogans-app/categories"
-              color="inherit"
-            >
+            <MLink component={Link} to="/categories" color="inherit">
               categories
             </MLink>
           </Button>
           <Button color="inherit">
-            <MLink component={Link} to="/slogans-app/sources" color="inherit">
+            <MLink component={Link} to="/sources" color="inherit">
               sources
             </MLink>
           </Button>
           <Button color="inherit">
-            <MLink component={Link} to="/slogans-app/dashboard" color="inherit">
+            <MLink component={Link} to="/dashboard" color="inherit">
               dashboard
             </MLink>
           </Button>

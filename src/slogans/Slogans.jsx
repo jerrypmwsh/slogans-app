@@ -15,6 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 
 import ErrorToast from "../ErrorToast";
 import SloganDialog from "./SloganDialog";
@@ -24,10 +25,11 @@ const url = import.meta.env.VITE_SLOGAN_URL;
 
 export default function Slogans() {
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate("/slogans-app/");
+      navigate("/");
     }
   }, [isAuthenticated]);
 
@@ -38,7 +40,11 @@ export default function Slogans() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [sloganToEdit, setSloganToEdit] = useState(null);
 
-  const handleDeleteClick = (id) => async () => {
+  const handleDeleteClick = (id) => async (event) => {
+    event.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this slogan?")) {
+      return;
+    }
     try {
       const token = await getAccessTokenSilently({
         audience: "https://tresosos.com/slogans",
@@ -51,12 +57,14 @@ export default function Slogans() {
       });
       if (response.status != 200) {
         setError({ message: "Failed to delete" });
+      } else {
+        enqueueSnackbar("Slogan deleted successfully!", { variant: "success" });
+        setData(data.filter((row) => row.id !== id));
       }
     } catch (error) {
       console.error(error);
       setError(error);
     }
-    setData(data.filter((row) => row.id !== id));
   };
 
   const fetchSlogans = async () => {

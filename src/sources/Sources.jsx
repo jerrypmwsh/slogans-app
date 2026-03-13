@@ -11,6 +11,7 @@ import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 
 import ErrorToast from "../ErrorToast";
 import SourceDialog from "./SourceDialog";
@@ -19,6 +20,7 @@ const url = import.meta.env.VITE_SLOGAN_URL;
 
 export default function Sources() {
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -74,6 +76,7 @@ export default function Sources() {
       if (response.status !== 200) {
         setError({ message: "Failed to delete" });
       } else {
+        enqueueSnackbar("Source deleted successfully!", { variant: "success" });
         setData(data.filter((row) => row.id !== id));
       }
     } catch (error) {
