@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -6,18 +6,29 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  Box,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
-export default function AddCategoryDialog({ open, onClose, onSave }) {
+export default function CategoryDialog({ open, onClose, onSave, categoryToEdit }) {
   const { enqueueSnackbar } = useSnackbar();
   const { getAccessTokenSilently } = useAuth0();
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const isEditing = !!categoryToEdit;
+
+  useEffect(() => {
+    if (open) {
+      if (isEditing) {
+        setCategory(categoryToEdit.category);
+      } else {
+        setCategory("");
+      }
+    }
+  }, [open, isEditing, categoryToEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,34 +43,41 @@ export default function AddCategoryDialog({ open, onClose, onSave }) {
         audience: "https://tresosos.com/slogans",
       });
 
-      const response = await fetch(`${url}categories`, {
-        method: "POST",
+      const method = isEditing ? "PUT" : "POST";
+      const endpoint = isEditing
+        ? `${url}categories/${categoryToEdit.id}`
+        : `${url}categories`;
+
+      const response = await fetch(endpoint, {
+        method: method,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ category }),
+        body: JSON.stringify({ category, updated_date_time: Date.now() }),
       });
 
       if (!response.ok) {
-        enqueueSnackbar(
-          "Failed to create category. Error: " + response.statusText,
-          {
-            variant: "error",
-          },
-        );
+        enqueueSnackbar("Failed to save category. Error: " + response.statusText, {
+          variant: "error",
+        });
       } else {
-        const newCategory = await response.json();
-        onSave(newCategory);
+        let savedCategory = {};
+        if (response.status !== 204) {
+            savedCategory = await response.json();
+        } else {
+            savedCategory = { ...categoryToEdit, category };
+        }
+
+        onSave(savedCategory);
         onClose();
-        setCategory(""); // Reset form
-        enqueueSnackbar("Category created successfully!", {
+        enqueueSnackbar(`Category ${isEditing ? "updated" : "created"} successfully!`, {
           variant: "success",
         });
       }
     } catch (error) {
       console.error(error);
-      enqueueSnackbar("Failed to create category. Error: " + error.message, {
+      enqueueSnackbar("Failed to save category. Error: " + error.message, {
         variant: "error",
       });
     } finally {
@@ -67,15 +85,10 @@ export default function AddCategoryDialog({ open, onClose, onSave }) {
     }
   };
 
-  const handleClose = () => {
-    setCategory("");
-    onClose();
-  };
-
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Add a new category</DialogTitle>
+        <DialogTitle>{isEditing ? "Edit Category" : "Add a new category"}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -90,9 +103,9 @@ export default function AddCategoryDialog({ open, onClose, onSave }) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" disabled={loading}>
-            {loading ? "Saving..." : "Add"}
+            {loading ? "Saving..." : "Save"}
           </Button>
         </DialogActions>
       </form>

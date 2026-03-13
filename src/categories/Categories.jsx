@@ -13,7 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 
 import ErrorToast from "../ErrorToast";
-import AddCategoryDialog from "./AddCategoryDialog";
+import CategoryDialog from "./CategoryDialog";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
@@ -23,7 +23,8 @@ export default function Categories() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -81,8 +82,26 @@ export default function Categories() {
     }
   };
 
-  const handleSaveCategory = (newCategory) => {
-    setData((prevData) => [newCategory, ...prevData]);
+  const handleSaveCategory = (savedCategory) => {
+    if (categoryToEdit) {
+      setData((prevData) =>
+        prevData.map((row) =>
+          row.id === savedCategory.id ? savedCategory : row,
+        ),
+      );
+    } else {
+      setData((prevData) => [savedCategory, ...prevData]);
+    }
+  };
+
+  const handleAddClick = () => {
+    setCategoryToEdit(null);
+    setDialogOpen(true);
+  };
+
+  const handleRowClick = (params) => {
+    setCategoryToEdit(params.row);
+    setDialogOpen(true);
   };
 
   const columns = [
@@ -124,7 +143,7 @@ export default function Categories() {
         >
           <Typography variant="h4">Categories</Typography>
           <Tooltip title="Add a category">
-            <IconButton color="primary" onClick={() => setAddDialogOpen(true)}>
+            <IconButton color="primary" onClick={handleAddClick}>
               <AddIcon />
             </IconButton>
           </Tooltip>
@@ -134,17 +153,16 @@ export default function Categories() {
             rows={data}
             columns={columns}
             loading={loading}
-            onRowClick={(params) => {
-              navigate("/slogans-app/categories/" + params.row.id);
-            }}
+            onRowClick={handleRowClick}
           />
         </div>
       </Container>
       <ErrorToast error={error} setError={setError} />
-      <AddCategoryDialog
-        open={addDialogOpen}
-        onClose={() => setAddDialogOpen(false)}
+      <CategoryDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
         onSave={handleSaveCategory}
+        categoryToEdit={categoryToEdit}
       />
     </div>
   );

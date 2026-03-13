@@ -13,7 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 
 import ErrorToast from "../ErrorToast";
-import AddSourceDialog from "./AddSourceDialog";
+import SourceDialog from "./SourceDialog";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
@@ -23,7 +23,8 @@ export default function Sources() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [sourceToEdit, setSourceToEdit] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -81,8 +82,24 @@ export default function Sources() {
     }
   };
 
-  const handleSaveSource = (newSource) => {
-    setData((prevData) => [newSource, ...prevData]);
+  const handleSaveSource = (savedSource) => {
+    if (sourceToEdit) {
+      setData((prevData) =>
+        prevData.map((row) => (row.id === savedSource.id ? savedSource : row)),
+      );
+    } else {
+      setData((prevData) => [savedSource, ...prevData]);
+    }
+  };
+
+  const handleAddClick = () => {
+    setSourceToEdit(null);
+    setDialogOpen(true);
+  };
+
+  const handleRowClick = (params) => {
+    setSourceToEdit(params.row);
+    setDialogOpen(true);
   };
 
   const columns = [
@@ -124,7 +141,7 @@ export default function Sources() {
         >
           <Typography variant="h4">Sources</Typography>
           <Tooltip title="Add a source">
-            <IconButton color="primary" onClick={() => setAddDialogOpen(true)}>
+            <IconButton color="primary" onClick={handleAddClick}>
               <AddIcon />
             </IconButton>
           </Tooltip>
@@ -134,17 +151,16 @@ export default function Sources() {
             rows={data}
             columns={columns}
             loading={loading}
-            onRowClick={(params) => {
-              navigate("/slogans-app/sources/" + params.row.id);
-            }}
+            onRowClick={handleRowClick}
           />
         </div>
       </Container>
       <ErrorToast error={error} setError={setError} />
-      <AddSourceDialog
-        open={addDialogOpen}
-        onClose={() => setAddDialogOpen(false)}
+      <SourceDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
         onSave={handleSaveSource}
+        sourceToEdit={sourceToEdit}
       />
     </div>
   );

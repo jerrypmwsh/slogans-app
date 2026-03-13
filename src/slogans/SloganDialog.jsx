@@ -8,14 +8,13 @@ import {
   TextField,
   Autocomplete,
   Stack,
-  Box,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const url = import.meta.env.VITE_SLOGAN_URL;
 
-export default function AddSloganDialog({ open, onClose, onSave }) {
+export default function SloganDialog({ open, onClose, onSave, sloganToEdit }) {
   const { enqueueSnackbar } = useSnackbar();
   const { getAccessTokenSilently } = useAuth0();
   const [slogan, setSlogan] = useState({});
@@ -23,7 +22,8 @@ export default function AddSloganDialog({ open, onClose, onSave }) {
   const [sourceOptions, setSourceOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch categories and sources when the dialog opens
+  const isEditing = !!sloganToEdit;
+
   useEffect(() => {
     if (open) {
       const fetchData = async () => {
@@ -34,14 +34,10 @@ export default function AddSloganDialog({ open, onClose, onSave }) {
 
           const [categoriesResponse, sourcesResponse] = await Promise.all([
             fetch(`${url}categories`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+              headers: { Authorization: `Bearer ${token}` },
             }),
             fetch(`${url}sources`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+              headers: { Authorization: `Bearer ${token}` },
             }),
           ]);
 
@@ -50,14 +46,39 @@ export default function AddSloganDialog({ open, onClose, onSave }) {
           const sourcesJson = await sourcesResponse.json();
           setSourceOptions(sourcesJson);
 
-          // Reset slogan state with defaults
-          setSlogan({
-            slogan: "",
-            company: "",
-            category: categoriesJson.length > 0 ? categoriesJson[0] : null,
-            source: sourcesJson.length > 0 ? sourcesJson[0] : null,
-            source_info: "",
-          });
+          if (isEditing) {
+            // Pre-populate for editing
+            // The table provides flat data (category string, source string), but we need objects for Autocomplete
+            // Or maybe the table provides objects? Let's check Slogans.jsx columns.
+            // Slogans.jsx columns: field "category" is likely just the name string based on the data grid.
+            // Wait, looking at Slogans.jsx: { field: "category", ... }
+            // The fetchSlogans response returns flat objects or nested?
+            // The original SloganDetail fetches specific slogan by ID, which likely returns IDs or names.
+            // Let's assume the passed `sloganToEdit` matches the shape of the row in DataGrid.
+            // If the DataGrid row has strings for category/source, we need to find the matching object in options.
+
+            const matchedCategory = categoriesJson.find(
+              (c) => c.category === sloganToEdit.category
+            );
+            const matchedSource = sourcesJson.find(
+              (s) => s.source === sloganToEdit.source
+            );
+
+            setSlogan({
+              ...sloganToEdit,
+              category: matchedCategory || null,
+              source: matchedSource || null,
+            });
+          } else {
+            // Defaults for creation
+            setSlogan({
+              slogan: "",
+              company: "",
+              category: categoriesJson.length > 0 ? categoriesJson[0] : null,
+              source: sourcesJson.length > 0 ? sourcesJson[0] : null,
+              source_info: "",
+            });
+          }
         } catch (e) {
           console.error(e);
           enqueueSnackbar("Failed to load options. Error: " + e.message, {
@@ -68,7 +89,7 @@ export default function AddSloganDialog({ open, onClose, onSave }) {
 
       fetchData();
     }
-  }, [open, getAccessTokenSilently, enqueueSnackbar]);
+  }, [open, getAccessTokenSilently, enqueueSnackbar, isEditing, sloganToEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -89,8 +110,11 @@ export default function AddSloganDialog({ open, onClose, onSave }) {
         audience: "https://tresosos.com/slogans",
       });
 
-      const response = await fetch(`${url}slogans`, {
-        method: "POST",
+      const method = isEditing ? "PUT" : "POST";
+      const endpoint = isEditing ? `${url}slogans/${slogan.id}` : `${url}slogans`;
+
+      const response = await fetch(endpoint, {
+        method: method,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -103,17 +127,31 @@ export default function AddSloganDialog({ open, onClose, onSave }) {
           variant: "error",
         });
       } else {
-        const newSlogan = await response.json();
-        // Construct the full object to return to the parent (including the category/source objects for display)
+        // If editing, the response might be empty or the updated object.
+        // If creating, it's the new object.
+        // Let's try to parse JSON, if it fails (empty body), use local state + ID?
+        // Usually PUT returns the updated object or 204.
+        // Original SloganDetail used PUT.
+
+        let savedSlogan = {};
+        if (response.status !== 204) {
+             savedSlogan = await response.json();
+        } else {
+            savedSlogan = { ...slogan };
+        }
+
+        // Construct display object
         const displaySlogan = {
-            ...newSlogan,
-            category: slogan.category?.category,
-            source: slogan.source?.source,
+          ...savedSlogan,
+          category: slogan.category?.category,
+          source: slogan.source?.source,
         };
 
         onSave(displaySlogan);
         onClose();
-        enqueueSnackbar("Slogan created successfully!", { variant: "success" });
+        enqueueSnackbar(`Slogan ${isEditing ? "updated" : "created"} successfully!`, {
+          variant: "success",
+        });
       }
     } catch (error) {
       console.error(error);
@@ -128,7 +166,7 @@ export default function AddSloganDialog({ open, onClose, onSave }) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Add a new slogan</DialogTitle>
+        <DialogTitle>{isEditing ? "Edit Slogan" : "Add a new slogan"}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField

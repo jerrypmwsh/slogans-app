@@ -17,7 +17,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import ErrorToast from "../ErrorToast";
-import AddSloganDialog from "./AddSloganDialog";
+import SloganDialog from "./SloganDialog";
 
 // TODO: contextualize
 const url = import.meta.env.VITE_SLOGAN_URL;
@@ -35,7 +35,8 @@ export default function Slogans() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = useState({});
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [sloganToEdit, setSloganToEdit] = useState(null);
 
   const handleDeleteClick = (id) => async () => {
     try {
@@ -91,8 +92,24 @@ export default function Slogans() {
     }
   };
 
-  const handleSaveSlogan = (newSlogan) => {
-    setData((prevData) => [newSlogan, ...prevData]);
+  const handleSaveSlogan = (savedSlogan) => {
+    if (sloganToEdit) {
+      setData((prevData) =>
+        prevData.map((row) => (row.id === savedSlogan.id ? savedSlogan : row)),
+      );
+    } else {
+      setData((prevData) => [savedSlogan, ...prevData]);
+    }
+  };
+
+  const handleAddClick = () => {
+    setSloganToEdit(null);
+    setDialogOpen(true);
+  };
+
+  const handleRowClick = (params) => {
+    setSloganToEdit(params.row);
+    setDialogOpen(true);
   };
 
   const columns = [
@@ -160,7 +177,7 @@ export default function Slogans() {
             }}
           />
           <Tooltip title="Add a slogan">
-            <IconButton color="primary" onClick={() => setAddDialogOpen(true)}>
+            <IconButton color="primary" onClick={handleAddClick}>
               <AddIcon />
             </IconButton>
           </Tooltip>
@@ -177,20 +194,17 @@ export default function Slogans() {
             pageSizeOptions={[5, 10, 25, 100]}
             rows={data}
             columns={columns}
-            onRowClick={(params, event, details) => {
-              navigate("/slogans-app/slogans/" + params.row.id);
-              console.log(params);
-              console.log(details);
-            }}
+            onRowClick={handleRowClick}
             loading={loading}
           ></DataGrid>
         }
       </Container>
       <ErrorToast error={error} setError={setError} />
-      <AddSloganDialog
-        open={addDialogOpen}
-        onClose={() => setAddDialogOpen(false)}
+      <SloganDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
         onSave={handleSaveSlogan}
+        sloganToEdit={sloganToEdit}
       />
     </div>
   );

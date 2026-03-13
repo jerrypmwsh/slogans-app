@@ -10,13 +10,8 @@ import LoginPage from "./LoginPage";
 import Dashboard from "./Dashboard";
 import NavBar from "./NavBar";
 import Slogans from "./slogans/Slogans";
-import SloganDetail from "./slogans/SloganDetail";
 import Categories from "./categories/Categories";
-import CategoryDetail from "./categories/CategoryDetail";
-import CategoryCreate from "./categories/CategoryCreate";
 import Sources from "./sources/Sources";
-import SourceDetail from "./sources/SourceDetail";
-import SourceCreate from "./sources/SourceCreate";
 import { SnackbarProvider } from "notistack";
 
 const Layout = () => (
@@ -54,32 +49,12 @@ const router = createBrowserRouter([
         element: <Slogans />,
       },
       {
-        path: "/slogans-app/slogans/:id",
-        element: <SloganDetail />,
-      },
-      {
         path: "/slogans-app/categories",
         element: <Categories />,
       },
       {
-        path: "/slogans-app/categories/new",
-        element: <CategoryCreate />,
-      },
-      {
-        path: "/slogans-app/categories/:id",
-        element: <CategoryDetail />,
-      },
-      {
         path: "/slogans-app/sources",
         element: <Sources />,
-      },
-      {
-        path: "/slogans-app/sources/new",
-        element: <SourceCreate />,
-      },
-      {
-        path: "/slogans-app/sources/:id",
-        element: <SourceDetail />,
       },
     ],
   },
