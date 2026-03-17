@@ -5,6 +5,7 @@ import {
   Typography,
   IconButton,
   Tooltip,
+  Paper,
 } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
@@ -134,33 +135,36 @@ export default function Categories() {
   return (
     <div>
       <Container
+        maxWidth="lg"
         style={{
           marginTop: "50px",
           display: "flex",
           flexDirection: "column",
         }}
       >
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          style={{ marginBottom: "20px" }}
-        >
-          <Typography variant="h4">Categories</Typography>
-          <Tooltip title="Add a category">
-            <IconButton color="primary" onClick={handleAddClick}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-        <div style={{ height: 600, width: "100%" }}>
-          <DataGrid
-            rows={data}
-            columns={columns}
-            loading={loading}
-            onRowClick={handleRowClick}
-          />
-        </div>
+        <Paper elevation={3} sx={{ p: 3, width: "100%" }}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            style={{ marginBottom: "20px" }}
+          >
+            <Typography variant="h4">Categories</Typography>
+            <Tooltip title="Add a category">
+              <IconButton color="primary" onClick={handleAddClick}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+          <div style={{ height: 600, width: "100%" }}>
+            <DataGrid
+              rows={data}
+              columns={columns}
+              loading={loading}
+              onRowClick={handleRowClick}
+            />
+          </div>
+        </Paper>
       </Container>
       <ErrorToast error={error} setError={setError} />
       <CategoryDialog

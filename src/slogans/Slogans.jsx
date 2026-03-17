@@ -8,6 +8,7 @@ import {
   InputAdornment,
   IconButton,
   Tooltip,
+  Paper,
 } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
@@ -160,52 +161,56 @@ export default function Slogans() {
   return (
     <div>
       <Container
+        maxWidth="lg"
         style={{
           marginTop: "50px",
           display: "flex",
           flexDirection: "column",
         }}
       >
-        <Stack direction="row" spacing={2} sx={{ width: "100%", mb: 3 }}>
-          <TextField
-            label="Search Slogans"
-            variant="outlined"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleSearch}
-            sx={{ flexGrow: 1 }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => handleSearch({ key: "Enter" })}>
-                    <SearchIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Tooltip title="Add a slogan">
-            <IconButton color="primary" onClick={handleAddClick}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-        <Typography variant="h6" style={{ marginBottom: "10px" }}>
-          {data.length} result(s) found
-        </Typography>
-        {
-          <DataGrid
-            initialState={{
-              ...data.initialState,
-              pagination: { paginationModel: { pageSize: 10 } },
-            }}
-            pageSizeOptions={[5, 10, 25, 100]}
-            rows={data}
-            columns={columns}
-            onRowClick={handleRowClick}
-            loading={loading}
-          ></DataGrid>
-        }
+        <Paper elevation={3} sx={{ p: 3, width: "100%" }}>
+          <Stack direction="row" spacing={2} sx={{ width: "100%", mb: 3 }}>
+            <TextField
+              label="Search Slogans"
+              variant="outlined"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleSearch}
+              sx={{ flexGrow: 1 }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => handleSearch({ key: "Enter" })}>
+                      <SearchIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Tooltip title="Add a slogan">
+              <IconButton color="primary" onClick={handleAddClick}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+          <Typography variant="h6" style={{ marginBottom: "10px" }}>
+            {data.length} result(s) found
+          </Typography>
+          {
+            <DataGrid
+              initialState={{
+                ...data.initialState,
+                pagination: { paginationModel: { pageSize: 10 } },
+              }}
+              pageSizeOptions={[5, 10, 25, 100]}
+              rows={data}
+              columns={columns}
+              onRowClick={handleRowClick}
+              loading={loading}
+              autoHeight
+            ></DataGrid>
+          }
+        </Paper>
       </Container>
       <ErrorToast error={error} setError={setError} />
       <SloganDialog
