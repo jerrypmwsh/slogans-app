@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { ThemeProvider } from "@mui/material";
+import { ThemeProvider, Box } from "@mui/material";
 import { appTheme } from "./Theme";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
@@ -10,25 +10,22 @@ import LoginPage from "./LoginPage";
 import Dashboard from "./Dashboard";
 import NavBar from "./NavBar";
 import Slogans from "./slogans/Slogans";
-import SloganDetail from "./slogans/SloganDetail";
+import Categories from "./categories/Categories";
+import Sources from "./sources/Sources";
+import { SnackbarProvider } from "notistack";
 
 const Layout = () => (
-  <div>
+  <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
     <header>
       <NavBar />
     </header>
-    <Outlet
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        flexDirection: "column",
-        alignContent: "center",
-        minHeight: "50vh",
-        gap: 2,
-        maxWidth: "50vh",
-      }}
-    />
-  </div>
+    <Box
+      component="main"
+      sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+    >
+      <Outlet />
+    </Box>
+  </Box>
 );
 
 const router = createBrowserRouter([
@@ -52,8 +49,12 @@ const router = createBrowserRouter([
         element: <Slogans />,
       },
       {
-        path: "/slogans/:id",
-        element: <SloganDetail />,
+        path: "/categories",
+        element: <Categories />,
+      },
+      {
+        path: "/sources",
+        element: <Sources />,
       },
     ],
   },
@@ -70,7 +71,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       }}
     >
       <ThemeProvider theme={appTheme}>
-        <RouterProvider router={router} />
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <RouterProvider router={router} />
+        </SnackbarProvider>
       </ThemeProvider>
     </Auth0Provider>
   </React.StrictMode>,
