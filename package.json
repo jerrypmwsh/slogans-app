@@ -8,7 +8,7 @@
     "build": "vite build",
     "ladle": "ladle serve",
     "preview": "vite preview",
-    "deploy": "push-dir --dir=dist --branch=gh-pages"
+    "deploy": "cp public/CNAME dist/CNAME && push-dir --dir=dist --branch=gh-pages"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
