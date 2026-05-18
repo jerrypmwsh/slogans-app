@@ -124,7 +124,12 @@ export default function Slogans() {
   const columns = [
     { field: "id", headerName: "ID", type: "number", flex: 2, editable: false },
     { field: "slogan", headerName: "Slogan", flex: 3, editable: false },
-    { field: "company", headerName: "Company", flex: 2, editable: false },
+    {
+      field: "company",
+      headerName: "Product / Company",
+      flex: 2,
+      editable: false,
+    },
     { field: "category", headerName: "Category", flex: 2, editable: false },
     { field: "source", headerName: "Source", flex: 2, editable: false },
     {
