@@ -180,7 +180,7 @@ export default function SloganDialog({ open, onClose, onSave, sloganToEdit }) {
               }
             />
             <TextField
-              label="Company"
+              label="Product / Company"
               variant="outlined"
               fullWidth
               value={slogan.company || ""}
